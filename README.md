@@ -12,7 +12,6 @@ This repository contains the massive, real-world simulated corpus files for Prob
 
 
 ### APPENDIX 1: EXTENDED DOCUMENTATION
-### HACKATHON RULEBOOK EXTENSION & JUDGING RUBRIC
 **1. Architectural Constraints:**
 Participants must build their solution using free-tier AI tools. Acceptable models include Groq, open-source models hosted locally or via OpenRouter, and AI Code Editors. The use of pre-trained, proprietary fine-tuned models specifically tailored for this dataset prior to the hackathon is strictly prohibited. Teams found utilizing unauthorized external APIs or bringing in pre-built templates will be disqualified under Section 5 of the Code of Conduct.
 
@@ -20,14 +19,5 @@ Participants must build their solution using free-tier AI tools. Acceptable mode
 Teams must provide a live link to their application hosted on platforms such as Vercel, Netlify, or Streamlit Cloud. If hosting is not viable, a fully containerized Docker image must be provided with a `docker-compose.yml` file that spins up all necessary services (e.g., frontend, backend, vector database). 
 
 **3. Handling The Messy Data (RAG Challenges):**
-As you explore the corpus, you will find that the text files are extremely long, filled with medical, legal, and operational boilerplate. This is intentional. Real-world medical systems generate vast amounts of metadata. Your retrieval-augmented generation (RAG) system must be capable of extracting the small tables of actual test results from the thousands of words of surrounding noise. Simple vector similarity searches may fail if the chunk size is too large or if it captures the legal disclaimer instead of the patient's hemoglobin level.
-
-Consider utilizing semantic chunking, metadata tagging, or specialized regex pre-processors to clean the data before embedding it. Alternatively, instruction-tuned LLMs with large context windows can process the entire document at once, but prompt engineering will be critical to prevent the model from getting distracted by the HIPAA notices and ISO compliance logs scattered throughout every single file.
-
-### APPENDIX 2: EXTENDED DOCUMENTATION
-**3. Infrastructure & Deployment:**
-Teams must provide a live link to their application hosted on platforms such as Vercel, Netlify, or Streamlit Cloud. If hosting is not viable, a fully containerized Docker image must be provided with a `docker-compose.yml` file that spins up all necessary services (e.g., frontend, backend, vector database). 
-
-**4. Handling The Messy Data (RAG Challenges):**
 As you explore the corpus, you will find that the text files are extremely long, filled with medical, legal, and operational boilerplate. This is intentional. Real-world medical systems generate vast amounts of metadata. Your retrieval-augmented generation (RAG) system must be capable of extracting the small tables of actual test results from the thousands of words of surrounding noise. Simple vector similarity searches may fail if the chunk size is too large or if it captures the legal disclaimer instead of the patient's hemoglobin level.
 Consider utilizing semantic chunking, metadata tagging, or specialized regex pre-processors to clean the data before embedding it. Alternatively, instruction-tuned LLMs with large context windows can process the entire document at once, but prompt engineering will be critical to prevent the model from getting distracted by the HIPAA notices and ISO compliance logs scattered throughout every single file.
