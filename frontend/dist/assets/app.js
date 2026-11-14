@@ -181,8 +181,23 @@ function selectPatientAndOpen(pid, targetView = "analysis-results") {
   runAnalyze(true, targetView);
 }
 
+function openMobileSidebar() {
+  const sb = document.getElementById("app-sidebar");
+  const bd = document.getElementById("sidebar-backdrop");
+  if (sb) sb.classList.remove("-translate-x-full");
+  if (bd) bd.classList.remove("hidden");
+}
+
+function closeMobileSidebar() {
+  const sb = document.getElementById("app-sidebar");
+  const bd = document.getElementById("sidebar-backdrop");
+  if (sb) sb.classList.add("-translate-x-full");
+  if (bd) bd.classList.add("hidden");
+}
+
 function setView(viewName) {
   state.view = viewName;
+  closeMobileSidebar();
   renderShell();
   renderCurrentView();
   window.scrollTo({ top: 0, behavior: "smooth" });
@@ -204,6 +219,18 @@ function renderShell() {
     }
   });
 
+  // Update Mobile Quick-Nav Strip active pill
+  document.querySelectorAll("#mobile-top-nav [data-nav-view]").forEach((el) => {
+    const v = el.getAttribute("data-nav-view");
+    if (v === state.view) {
+      el.className =
+        "mobile-nav-pill shrink-0 px-3 py-1.5 rounded-full font-label-sm text-label-sm font-semibold bg-primary text-on-primary flex items-center gap-1 transition-all";
+    } else {
+      el.className =
+        "mobile-nav-pill shrink-0 px-3 py-1.5 rounded-full font-label-sm text-label-sm font-medium bg-surface-container-low text-on-surface-variant hover:bg-surface-container flex items-center gap-1 transition-all";
+    }
+  });
+
   // Update Breadcrumb
   const bc = document.getElementById("breadcrumb-current");
   if (bc) bc.textContent = VIEW_LABELS[state.view] || "Dashboard";
@@ -212,8 +239,8 @@ function renderShell() {
   document.querySelectorAll("[data-lang-btn]").forEach((btn) => {
     const active = btn.getAttribute("data-lang-btn") === state.lang;
     btn.className = active
-      ? "px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold bg-primary text-on-primary transition-all"
-      : "px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all";
+      ? "px-2.5 sm:px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold bg-primary text-on-primary transition-all"
+      : "px-2.5 sm:px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all";
   });
 
   // Update TTS label
@@ -243,9 +270,10 @@ function renderShell() {
     pLabel.textContent = `Patient: ${p.name || "Custom Report"} (${p.patient_id || "Custom"})`;
   }
 
-  // Translate persistent shell (Sidebar + Header)
+  // Translate persistent shell (Sidebar + Header + Mobile Nav)
   translateDOM(document.querySelector("aside"), state.lang);
   translateDOM(document.querySelector("header"), state.lang);
+  translateDOM(document.getElementById("mobile-top-nav"), state.lang);
 }
 
 function computePinPct(r) {
@@ -265,9 +293,9 @@ function computePinPct(r) {
 function renderDashboardView() {
   const featured = ["P001", "P004", "P005", "P003"].map((id) => SEED_MAP[id]).filter(Boolean);
   return `
-    <main class="p-6 lg:p-8 max-w-[1440px] w-full mx-auto space-y-8">
+    <main class="p-4 sm:p-6 lg:p-8 max-w-[1440px] w-full mx-auto space-y-6 sm:space-y-8">
       <!-- 1. WELCOME HERO SECTION -->
-      <section class="relative overflow-hidden rounded-lg bg-gradient-to-br from-[#3458C8] via-[#2F4FA8] to-[#2546A8] text-white p-8 md:p-10 shadow-lg shadow-tertiary/10">
+      <section class="relative overflow-hidden rounded-lg bg-gradient-to-br from-[#3458C8] via-[#2F4FA8] to-[#2546A8] text-white p-5 sm:p-8 md:p-10 shadow-lg shadow-tertiary/10">
         <div class="absolute -right-16 -top-16 w-80 h-80 rounded-full bg-white/5 blur-3xl pointer-events-none"></div>
         <div class="absolute right-40 -bottom-20 w-64 h-64 rounded-full bg-primary-container/20 blur-2xl pointer-events-none"></div>
         <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
@@ -2138,13 +2166,24 @@ function closeModal() {
 }
 
 function initShellEvents() {
-  // Sidebar navigation
+  // Mobile Sidebar drawer controls
+  const menuBtn = document.getElementById("mobile-menu-btn");
+  if (menuBtn) menuBtn.addEventListener("click", openMobileSidebar);
+  const closeBtn = document.getElementById("sidebar-close-btn");
+  if (closeBtn) closeBtn.addEventListener("click", closeMobileSidebar);
+  const backdrop = document.getElementById("sidebar-backdrop");
+  if (backdrop) backdrop.addEventListener("click", closeMobileSidebar);
+
+  // Sidebar & Mobile Top-Nav navigation
   document.querySelectorAll("[data-nav-view]").forEach((el) => {
     el.addEventListener("click", () => setView(el.getAttribute("data-nav-view")));
   });
 
   document.getElementById("sidebar-new-analysis").addEventListener("click", () => setView("analyze-report"));
-  document.getElementById("btn-audit-sidebar").addEventListener("click", openAuditModal);
+  document.getElementById("btn-audit-sidebar").addEventListener("click", () => {
+    closeMobileSidebar();
+    openAuditModal();
+  });
   document.getElementById("header-patient-pill").addEventListener("click", () => setView("analysis-results"));
   document.getElementById("btn-tts").addEventListener("click", toggleReadAloud);
   const demoBtn = document.getElementById("btn-demo-mode");

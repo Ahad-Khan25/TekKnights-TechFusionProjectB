@@ -153,13 +153,21 @@
     }
   </style>
 </head>
-<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex overflow-x-hidden selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+  <!-- Mobile Sidebar Backdrop Overlay -->
+  <div id="sidebar-backdrop" class="fixed inset-0 bg-on-surface/40 backdrop-blur-xs z-30 hidden lg:hidden"></div>
+
   <!-- ================= PERSISTENT LEFT SIDEBAR DOCK (Teammate Stitch Design) ================= -->
-  <aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-surface-container-lowest border-r border-outline-variant/30 shadow-sm z-30 shrink-0">
+  <aside id="app-sidebar" class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-surface-container-lowest border-r border-outline-variant/30 shadow-lg lg:shadow-sm z-40 shrink-0 -translate-x-full lg:translate-x-0 transition-transform duration-200 ease-in-out overflow-y-auto">
     <div class="p-4 flex flex-col">
-      <!-- Brand Anchor -->
-      <div class="flex items-center px-1 py-2 mb-4 cursor-pointer" data-nav-view="dashboard">
-        <img src="/assets/logo.jpg" alt="CityLab Diagnostic AI Suite" class="w-full max-h-14 object-contain" />
+      <!-- Brand Anchor + Mobile Drawer Close -->
+      <div class="flex items-center justify-between gap-2 px-1 py-2 mb-4">
+        <div class="flex items-center flex-1 cursor-pointer" data-nav-view="dashboard">
+          <img src="/assets/logo.jpg" alt="CityLab Diagnostic AI Suite" class="w-full max-h-14 object-contain" />
+        </div>
+        <button id="sidebar-close-btn" type="button" class="lg:hidden p-1.5 rounded-full hover:bg-surface-container text-on-surface-variant" aria-label="Close Menu">
+          <span class="material-symbols-outlined text-[20px]">close</span>
+        </button>
       </div>
 
       <!-- Quick CTA Button -->
@@ -220,16 +228,19 @@
     </div>
   </aside>
 
-  <!-- ================= MAIN OPERATIONAL WORKSPACE (Offset 256px) ================= -->
-  <div id="workspace-shell" class="ml-64 flex-1 flex flex-col min-w-0 min-h-screen">
+  <!-- ================= MAIN OPERATIONAL WORKSPACE (Responsive Offset) ================= -->
+  <div id="workspace-shell" class="ml-0 lg:ml-64 flex-1 flex flex-col min-w-0 w-full max-w-full overflow-x-hidden min-h-screen">
     <!-- Top Persistent Bar -->
-    <header class="sticky top-0 h-16 w-full bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/30 px-6 lg:px-8 flex items-center justify-between gap-4 z-20">
-      <!-- Left: Breadcrumb & Global Search -->
-      <div class="flex items-center gap-5 flex-1 max-w-2xl">
-        <div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm shrink-0">
-          <span class="font-headline-sm text-headline-sm font-bold text-on-surface cursor-pointer" data-nav-view="dashboard">CityLab</span>
-          <span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
-          <span id="breadcrumb-current" class="text-primary font-semibold">Dashboard</span>
+    <header class="sticky top-0 min-h-14 sm:min-h-16 py-2 w-full bg-surface-container-lowest/95 backdrop-blur-md border-b border-outline-variant/30 px-3 sm:px-6 lg:px-8 flex flex-wrap items-center justify-between gap-2 sm:gap-4 z-20">
+      <!-- Left: Mobile Hamburger + Breadcrumb & Global Search -->
+      <div class="flex items-center gap-2.5 sm:gap-5 flex-1 min-w-0 max-w-2xl">
+        <button id="mobile-menu-btn" type="button" class="lg:hidden p-1.5 rounded-DEFAULT bg-surface-container-low hover:bg-surface-container text-on-surface flex items-center justify-center shrink-0" aria-label="Open Menu">
+          <span class="material-symbols-outlined text-[22px]">menu</span>
+        </button>
+        <div class="flex items-center gap-1.5 sm:gap-2 text-on-surface-variant font-body-sm text-body-sm min-w-0 truncate">
+          <span class="font-headline-sm text-headline-sm font-bold text-on-surface cursor-pointer shrink-0" data-nav-view="dashboard">CityLab</span>
+          <span class="material-symbols-outlined text-[16px] text-outline shrink-0">chevron_right</span>
+          <span id="breadcrumb-current" class="text-primary font-semibold truncate">Dashboard</span>
         </div>
         <!-- Search Bar -->
         <div class="relative w-full max-w-sm hidden md:block">
@@ -239,12 +250,12 @@
       </div>
 
       <!-- Right: Language Toggle, Bonus Actions, Live Backend Status & Active Patient Pill -->
-      <div class="flex items-center gap-3 shrink-0">
+      <div class="flex flex-wrap items-center gap-1.5 sm:gap-2.5">
         <!-- Bonus Feature: Multilingual Toggle (EN / Urdu / Roman Urdu) -->
         <div class="inline-flex p-0.5 bg-surface-container-low rounded-full border border-outline-variant/40" role="group" aria-label="Language Toggle">
-          <button data-lang-btn="en" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold bg-primary text-on-primary transition-all">EN</button>
-          <button data-lang-btn="ur" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all">اردو</button>
-          <button data-lang-btn="ro-ur" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all">Roman Urdu</button>
+          <button data-lang-btn="en" class="px-2.5 sm:px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold bg-primary text-on-primary transition-all">EN</button>
+          <button data-lang-btn="ur" class="px-2.5 sm:px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all">اردو</button>
+          <button data-lang-btn="ro-ur" class="px-2.5 sm:px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all">Roman Urdu</button>
         </div>
 
         <!-- Read Aloud TTS Button -->
@@ -254,13 +265,13 @@
         </button>
 
         <!-- Auto-Play Demo Mode with Subtitles -->
-        <button id="btn-demo-mode" class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-secondary text-on-secondary hover:opacity-95 font-label-sm text-label-sm font-bold shadow-xs transition-all" title="Start Automated Video Demo with Subtitles">
-          <span class="material-symbols-outlined text-[16px] fill">movie</span>
+        <button id="btn-demo-mode" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-secondary text-on-secondary hover:opacity-95 font-label-sm text-label-sm font-bold shadow-xs transition-all" title="Start Automated Video Demo with Subtitles">
+          <span class="material-symbols-outlined text-[15px] sm:text-[16px] fill">movie</span>
           <span>Demo Video</span>
         </button>
 
         <!-- Live Backend Status Pill -->
-        <div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-lowest rounded-full border border-outline-variant/40 shadow-xs">
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-surface-container-lowest rounded-full border border-outline-variant/40 shadow-xs">
           <span class="relative flex h-2.5 w-2.5">
             <span id="health-ping" class="pulse-indicator absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span>
             <span id="health-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#209B72]"></span>
@@ -276,8 +287,36 @@
       </div>
     </header>
 
+    <!-- Mobile Horizontal Quick-Navigation Strip (< lg viewports) -->
+    <nav id="mobile-top-nav" class="lg:hidden flex items-center gap-1.5 overflow-x-auto px-3 py-2 bg-surface-container-lowest border-b border-outline-variant/25 shrink-0">
+      <button type="button" data-nav-view="dashboard" class="mobile-nav-pill shrink-0 px-3 py-1.5 rounded-full font-label-sm text-label-sm font-semibold bg-primary text-on-primary flex items-center gap-1">
+        <span class="material-symbols-outlined text-[15px]">dashboard</span>
+        <span>Dashboard</span>
+      </button>
+      <button type="button" data-nav-view="patients" class="mobile-nav-pill shrink-0 px-3 py-1.5 rounded-full font-label-sm text-label-sm font-medium bg-surface-container-low text-on-surface-variant flex items-center gap-1">
+        <span class="material-symbols-outlined text-[15px]">people</span>
+        <span>Patients (14)</span>
+      </button>
+      <button type="button" data-nav-view="analyze-report" class="mobile-nav-pill shrink-0 px-3 py-1.5 rounded-full font-label-sm text-label-sm font-medium bg-surface-container-low text-on-surface-variant flex items-center gap-1">
+        <span class="material-symbols-outlined text-[15px]">upload_file</span>
+        <span>Analyze Report</span>
+      </button>
+      <button type="button" data-nav-view="analysis-results" class="mobile-nav-pill shrink-0 px-3 py-1.5 rounded-full font-label-sm text-label-sm font-medium bg-surface-container-low text-on-surface-variant flex items-center gap-1">
+        <span class="material-symbols-outlined text-[15px]">biotech</span>
+        <span>Analysis Results</span>
+      </button>
+      <button type="button" data-nav-view="ai-assistant" class="mobile-nav-pill shrink-0 px-3 py-1.5 rounded-full font-label-sm text-label-sm font-medium bg-surface-container-low text-on-surface-variant flex items-center gap-1">
+        <span class="material-symbols-outlined text-[15px]">smart_toy</span>
+        <span>AI Assistant</span>
+      </button>
+      <button type="button" data-nav-view="how-it-works" class="mobile-nav-pill shrink-0 px-3 py-1.5 rounded-full font-label-sm text-label-sm font-medium bg-surface-container-low text-on-surface-variant flex items-center gap-1">
+        <span class="material-symbols-outlined text-[15px]">help_outline</span>
+        <span>How It Works</span>
+      </button>
+    </nav>
+
     <!-- Dynamic View Container -->
-    <div id="view-root" class="flex-1 flex flex-col"></div>
+    <div id="view-root" class="flex-1 flex flex-col w-full max-w-full overflow-x-hidden"></div>
   </div>
 
   <!-- Modal Root (Printable Doctor Visit Sheet & Live 14/14 Audit) -->
