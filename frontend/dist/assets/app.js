@@ -1,5 +1,6 @@
 import { SEED_PATIENTS, TRICKY_SAMPLE_REPORT } from "./mocks.js";
 import { translateDOM } from "./i18n.js";
+import { initDemoPlayer, startDemoMode } from "./demo.js";
 
 const API_BASE = window.VITE_API_BASE_URL || "";
 
@@ -2146,6 +2147,8 @@ function initShellEvents() {
   document.getElementById("btn-audit-sidebar").addEventListener("click", openAuditModal);
   document.getElementById("header-patient-pill").addEventListener("click", () => setView("analysis-results"));
   document.getElementById("btn-tts").addEventListener("click", toggleReadAloud);
+  const demoBtn = document.getElementById("btn-demo-mode");
+  if (demoBtn) demoBtn.addEventListener("click", startDemoMode);
 
   // Language toggle buttons
   document.querySelectorAll("[data-lang-btn]").forEach((btn) => {
@@ -2180,6 +2183,82 @@ function initShellEvents() {
 
 window.addEventListener("DOMContentLoaded", () => {
   initShellEvents();
+  initDemoPlayer({
+    setView: (v) => setView(v),
+    closeModal: () => closeModal(),
+    openAuditModal: () => openAuditModal(),
+    openExportModal: () => openExportModal(),
+    setLang: async (l, skipBackend = false) => {
+      state.lang = l;
+      renderShell();
+      renderCurrentView();
+      if (!skipBackend) await runAnalyze(false, null, true);
+    },
+    selectPatient: async (pid, targetView = "analysis-results") => {
+      state.activeMode = "patient";
+      state.selectedPatientId = pid;
+      state.overrideAge = null;
+      state.overrideSex = null;
+      await runAnalyze(true, targetView);
+    },
+    supplyDemographicsAndAnalyze: async (age, sex) => {
+      state.overrideAge = age;
+      state.overrideSex = sex;
+      renderCurrentView();
+      await new Promise((r) => setTimeout(r, 900));
+      await runAnalyze(false, "analysis-results");
+    },
+    loadCustomTextInAnalyzeView: (txt) => {
+      state.customText = txt;
+      setView("analyze-report");
+    },
+    submitCustomReport: async () => {
+      state.activeMode = "custom";
+      state.overrideAge = null;
+      state.overrideSex = null;
+      await runAnalyze(true, "analysis-results");
+    },
+    ensureGauntletAnalyzed: async () => {
+      if (state.activeMode !== "custom" || !state.customText.includes("Hamza Tariq")) {
+        state.customText = [
+          "# CITYLAB DIAGNOSTICS - UPLOADED TEST REPORT",
+          "* **Patient Full Name**: Hamza Tariq",
+          "* **Recorded Age**: 38",
+          "* **Biological Sex**: Male",
+          "",
+          "## ANALYTICAL RESULTS",
+          "- **SGPT**: 45 U/L",
+          "- **FBS**: 6.0 mmol/L",
+          "- **Total Cholesterol**: 200 mg/dL",
+          "- **Hemoglobin**: 6.8 g/dL",
+          "- **Vitamin B12**: 210 pg/mL",
+        ].join("\n");
+        state.activeMode = "custom";
+        state.overrideAge = null;
+        state.overrideSex = null;
+        await runAnalyze(true, "analysis-results");
+      } else {
+        setView("analysis-results");
+      }
+    },
+    runDemoSimulation: async () => {
+      setView("analysis-results");
+      // Open all simulator details
+      document.querySelectorAll("details").forEach((d) => {
+        if (d.textContent.includes("Simulator")) d.open = true;
+      });
+      const simIn = document.getElementById("sim-val-3") || document.getElementById("sim-val-0");
+      const simBtn = document.querySelector("[data-sim-idx='3']") || document.querySelector("[data-sim-idx='0']");
+      if (simIn && simBtn) {
+        simIn.value = "14.5";
+        simIn.scrollIntoView({ behavior: "smooth", block: "center" });
+        simBtn.click();
+      }
+    },
+    sendChat: async (q) => {
+      await sendChatQuestion(q);
+    },
+  });
   loadHealthAndPatients();
   runAnalyze(true);
 });
