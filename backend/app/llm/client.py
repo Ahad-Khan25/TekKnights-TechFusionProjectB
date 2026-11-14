@@ -131,6 +131,8 @@ class LLMClient:
                 log.warning("llm provider failed provider=%s model=%s code=%s err=%s", provider, model, e.code, e)
                 if e.status == 429:  # rate-limited even after retries: rest this provider for a while
                     self._cooldown[f"{provider}:{model}"] = time.monotonic() + 30
+                elif e.status in (401, 403, 404):  # invalid/revoked key or missing model: cool down 5m
+                    self._cooldown[f"{provider}:{model}"] = time.monotonic() + 300
         raise last_err or LLMError("All LLM providers are cooling down after rate limits", code="RATE_LIMITED")
 
     async def aclose(self) -> None:
