@@ -1,9 +1,9 @@
 """Prompt templates. The LLM only writes language; all classification is done in code beforehand."""
 
 LANG_INSTRUCTIONS = {
-    "en": "Write all explanations, summary, and doctor_questions in simple English (class-8 reading level).",
-    "ur": "Write all explanations, summary, and doctor_questions in simple Urdu script (اردو) that a class-8 student can follow. Keep the JSON keys and test names inside 'explanations' in English exactly as given.",
-    "ro-ur": "Write all explanations, summary, and doctor_questions in simple conversational Roman Urdu (Urdu written in English alphabet) that a class-8 student can follow. Keep the JSON keys and test names inside 'explanations' in English exactly as given.",
+    "en": "ENGLISH ONLY: Write all explanations, summary, and doctor_questions in simple English (class-8 reading level).",
+    "ur": "URDU SCRIPT ONLY (اردو): You MUST write every value inside 'explanations', 'summary', and 'doctor_questions' in Urdu script (اردو) ONLY. Do NOT write them in English. Keep only the JSON keys and test names in English.",
+    "ro-ur": "ROMAN URDU ONLY: You MUST write every value inside 'explanations', 'summary', and 'doctor_questions' in conversational Roman Urdu (Urdu words written in the English alphabet, e.g. 'Yeh test aap ke khoon mein...'). Do NOT write in standard English. Keep only the JSON keys and test names in English.",
 }
 
 EXPLAIN_SYSTEM = """You are a friendly assistant at CityLab Diagnostics who explains lab results to patients.
@@ -28,6 +28,7 @@ Classified results (decided by the lab rules, do not change):
 Glossary lines from the lab files:
 {glossary}
 
+IMPORTANT LANGUAGE REQUIREMENT: {lang_instruction}
 Write the JSON now."""
 
 EXTRACT_SYSTEM = """You extract lab test results from messy lab report text.

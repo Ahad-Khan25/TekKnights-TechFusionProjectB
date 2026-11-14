@@ -1,4 +1,5 @@
 import { SEED_PATIENTS, TRICKY_SAMPLE_REPORT } from "./mocks.js";
+import { translateDOM } from "./i18n.js";
 
 const API_BASE = window.VITE_API_BASE_URL || "";
 
@@ -138,8 +139,8 @@ async function loadHealthAndPatients() {
   renderShell();
 }
 
-async function runAnalyze(resetChat = false, switchToView = null) {
-  state.loading = true;
+async function runAnalyze(resetChat = false, switchToView = null, silent = false) {
+  state.loading = !silent;
   state.error = null;
   if (resetChat) state.chatHistory = [];
   if (switchToView) state.view = switchToView;
@@ -240,6 +241,10 @@ function renderShell() {
   if (pLabel) {
     pLabel.textContent = `Patient: ${p.name || "Custom Report"} (${p.patient_id || "Custom"})`;
   }
+
+  // Translate persistent shell (Sidebar + Header)
+  translateDOM(document.querySelector("aside"), state.lang);
+  translateDOM(document.querySelector("header"), state.lang);
 }
 
 function computePinPct(r) {
@@ -1709,6 +1714,7 @@ function renderCurrentView() {
   else if (state.view === "ai-assistant") root.innerHTML = renderAiAssistantView();
   else if (state.view === "how-it-works") root.innerHTML = renderHowItWorksView();
 
+  translateDOM(root, state.lang);
   bindViewEvents();
 }
 
@@ -1921,6 +1927,7 @@ function bindViewEvents() {
             <div class="${state.lang === "ur" ? "rtl-text" : ""} text-on-surface">${esc(r.explanation)}</div>
           </div>
         `;
+        translateDOM(outEl, state.lang);
       } catch (e) {
         outEl.textContent = e.message || "Simulation failed";
       }
@@ -2036,6 +2043,7 @@ async function openExportModal() {
         </div>
       </div>
     `;
+    translateDOM(modal, state.lang);
     document.getElementById("modal-close-btn").onclick = closeModal;
     document.getElementById("modal-copy-md").onclick = () => {
       navigator.clipboard?.writeText(res.markdown);
@@ -2111,6 +2119,7 @@ async function openAuditModal() {
         </div>
       </div>
     `;
+    translateDOM(modal, state.lang);
     document.getElementById("modal-close-btn").onclick = closeModal;
     modal.querySelectorAll("[data-audit-open]").forEach((btn) => {
       btn.onclick = () => {
@@ -2146,7 +2155,8 @@ function initShellEvents() {
     btn.addEventListener("click", () => {
       state.lang = btn.getAttribute("data-lang-btn");
       renderShell();
-      runAnalyze(false);
+      renderCurrentView();
+      runAnalyze(false, null, true);
     });
   });
 

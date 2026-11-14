@@ -176,10 +176,36 @@ def template_questions(results: list[dict], lang: str = "en") -> list[str]:
     return qs[:5]
 
 
+def matches_target_lang(text: str, lang: str = "en") -> bool:
+    """Verify that LLM output actually uses the requested language ('en', 'ur', or 'ro-ur')."""
+    if not text or not text.strip():
+        return False
+    lang = norm_lang(lang)
+    has_urdu_script = bool(re.search(r"[\u0600-\u06FF]", text))
+    if lang == "ur":
+        return has_urdu_script
+    if lang == "ro-ur":
+        if has_urdu_script:
+            return False
+        return bool(
+            re.search(
+                r"\b(hai|hain|mein|ka|ki|ke|aap|se|ko|aur|par|yeh|ye|is|nahi|kya|apne|ho|sakta|sakti|sakte)\b",
+                text,
+                re.I,
+            )
+        )
+    return not has_urdu_script
+
+
 def clean_questions(qs: object, results: list[dict], lang: str = "en") -> list[str]:
+    lang = norm_lang(lang)
     if not isinstance(qs, list):
         return template_questions(results, lang)
-    out = [q.strip() for q in qs if isinstance(q, str) and q.strip() and not looks_like_diagnosis(q)]
+    out = [
+        q.strip()
+        for q in qs
+        if isinstance(q, str) and q.strip() and not looks_like_diagnosis(q) and matches_target_lang(q, lang)
+    ]
     if len(out) < 3:
         for q in template_questions(results, lang):
             if len(out) >= 3:

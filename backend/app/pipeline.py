@@ -24,6 +24,7 @@ from .safety import (
     clean_questions,
     get_disclaimer,
     looks_like_diagnosis,
+    matches_target_lang,
     norm_lang,
     template_explanation,
     template_questions,
@@ -191,10 +192,10 @@ class Pipeline:
                 lower = {str(k).lower(): v for k, v in exps.items()}
                 for r in results:
                     e = exps.get(r["test"]) or lower.get(r["test"].lower()) or lower.get(r["test_raw"].lower())
-                    if isinstance(e, str) and e.strip() and not looks_like_diagnosis(e):
+                    if isinstance(e, str) and e.strip() and not looks_like_diagnosis(e) and matches_target_lang(e, lang):
                         r["explanation"] = e.strip()
                 s = res.data.get("summary")
-                if isinstance(s, str) and s.strip() and not looks_like_diagnosis(s):
+                if isinstance(s, str) and s.strip() and not looks_like_diagnosis(s) and matches_target_lang(s, lang):
                     summary = s.strip()
                 questions = clean_questions(res.data.get("doctor_questions"), results, lang)
             except LLMError as e:
