@@ -17,7 +17,7 @@ from dataclasses import dataclass, field
 
 import httpx
 
-from ..config import Settings, settings
+from ..config import ENV_FILE, Settings, load_fresh_settings, settings
 from .cache import TTLCache
 
 log = logging.getLogger("llm")
@@ -75,6 +75,8 @@ def extract_json(text: str) -> dict:
 class LLMClient:
     def __init__(self, cfg: Settings = settings, transport: httpx.AsyncBaseTransport | None = None) -> None:
         self.cfg = cfg
+        self._auto_reload_env = cfg is settings and transport is None
+        self._env_mtime = ENV_FILE.stat().st_mtime if (self._auto_reload_env and ENV_FILE.exists()) else 0.0
         self.cache = TTLCache(cfg.cache_max_items, cfg.cache_ttl_s)
         self._sem = asyncio.Semaphore(cfg.llm_max_concurrency)  # request queue: at most N in flight
         self._throttle_lock = asyncio.Lock()
@@ -83,9 +85,20 @@ class LLMClient:
         self._client = httpx.AsyncClient(timeout=cfg.llm_timeout_s, transport=transport)
         self.usage = {"calls": 0, "prompt_tokens": 0, "completion_tokens": 0, "errors": 0, "fallbacks": 0}
 
-    # ---- provider configuration -------------------------------------------------------------
-    def providers(self) -> list[tuple[str, str]]:
-        """Ordered (provider, model) chain, skipping providers without keys."""
+    def _maybe_reload_env(self) -> None:
+        if not self._auto_reload_env or not ENV_FILE.exists():
+            return
+        try:
+            mtime = ENV_FILE.stat().st_mtime
+            if mtime != self._env_mtime:
+                self._env_mtime = mtime
+                self.cfg = load_fresh_settings()
+                self._cooldown.clear()
+                log.info("Hot-reloaded .env settings (providers=%s)", [p for p, _ in self._build_chain()])
+        except OSError:
+            pass
+
+    def _build_chain(self) -> list[tuple[str, str]]:
         chain: list[tuple[str, str]] = []
         for p in self.cfg.provider_order:
             if p == "gemini" and self.cfg.gemini_api_key:
@@ -97,6 +110,12 @@ class LLMClient:
             elif p == "openrouter" and self.cfg.openrouter_api_key:
                 chain.append(("openrouter", self.cfg.openrouter_model))
         return chain
+
+    # ---- provider configuration -------------------------------------------------------------
+    def providers(self) -> list[tuple[str, str]]:
+        """Ordered (provider, model) chain, skipping providers without keys."""
+        self._maybe_reload_env()
+        return self._build_chain()
 
     @property
     def enabled(self) -> bool:
