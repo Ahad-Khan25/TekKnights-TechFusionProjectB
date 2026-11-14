@@ -1,118 +1,286 @@
 <!DOCTYPE html>
-<html lang="en">
+<html class="h-full" lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>CityLab Diagnostics — AI Lab Report Explainer</title>
-  <link rel="stylesheet" href="/assets/styles.css" />
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>CityLab Diagnostics — Medical Lab Report Explainer</title>
+  <!-- Google Fonts: Plus Jakarta Sans, Work Sans & Noto Nastaliq Urdu -->
+  <link href="https://fonts.googleapis.com" rel="preconnect" />
+  <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@500;600;700;800&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <!-- Material Symbols Outlined -->
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS CDN with forms & container queries (Teammate Stitch Config) -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "surface-container-highest": "#d8e2ff",
+            "on-surface": "#101b32",
+            "on-primary-fixed-variant": "#005049",
+            "surface-container-lowest": "#ffffff",
+            "primary-fixed": "#7ef6e6",
+            "outline": "#6d7a77",
+            "secondary-fixed-dim": "#b6c4ff",
+            "surface-container": "#e9edff",
+            "on-tertiary": "#ffffff",
+            "on-primary-container": "#003530",
+            "on-error": "#ffffff",
+            "surface-dim": "#cfdaf9",
+            "inverse-surface": "#253048",
+            "inverse-primary": "#5fdaca",
+            "surface-variant": "#d8e2ff",
+            "on-tertiary-fixed": "#00164d",
+            "tertiary-container": "#7191f9",
+            "surface-bright": "#faf9ff",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "secondary-fixed": "#dce1ff",
+            "primary-container": "#19a89a",
+            "on-secondary-fixed-variant": "#0b3bad",
+            "primary-fixed-dim": "#5fdaca",
+            "on-tertiary-container": "#002778",
+            "surface-tint": "#006a61",
+            "secondary-container": "#6c8cff",
+            "tertiary": "#3457bc",
+            "on-primary": "#ffffff",
+            "secondary": "#3155c5",
+            "on-primary-fixed": "#00201c",
+            "inverse-on-surface": "#edf0ff",
+            "on-error-container": "#93000a",
+            "primary": "#006a61",
+            "on-secondary": "#ffffff",
+            "tertiary-fixed": "#dce1ff",
+            "surface-container-low": "#f1f3ff",
+            "tertiary-fixed-dim": "#b5c4ff",
+            "surface": "#faf9ff",
+            "on-tertiary-fixed-variant": "#133ea3",
+            "on-background": "#101b32",
+            "background": "#faf9ff",
+            "on-secondary-container": "#002375",
+            "surface-container-high": "#e1e8ff",
+            "on-surface-variant": "#3d4947",
+            "on-secondary-fixed": "#001550",
+            "outline-variant": "#bcc9c6"
+          },
+          borderRadius: {
+            DEFAULT: "1rem",
+            lg: "2rem",
+            xl: "3rem",
+            full: "9999px"
+          },
+          spacing: {
+            "space-2xl": "3rem",
+            "margin-mobile": "1rem",
+            gutter: "1.5rem",
+            "space-sm": "0.5rem",
+            margin: "2rem",
+            "gutter-mobile": "1rem",
+            "space-md": "1rem",
+            "space-lg": "1.5rem",
+            "space-xs": "0.25rem",
+            "space-xl": "2rem"
+          },
+          fontFamily: {
+            "body-lg": ["Work Sans", "sans-serif"],
+            "headline-xl-mobile": ["Plus Jakarta Sans", "sans-serif"],
+            "label-lg": ["Work Sans", "sans-serif"],
+            "data-metric": ["Plus Jakarta Sans", "sans-serif"],
+            "body-md": ["Work Sans", "sans-serif"],
+            "headline-xl": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-md": ["Plus Jakarta Sans", "sans-serif"],
+            "headline-lg": ["Plus Jakarta Sans", "sans-serif"],
+            "label-sm": ["Work Sans", "sans-serif"],
+            "label-md": ["Work Sans", "sans-serif"],
+            "body-sm": ["Work Sans", "sans-serif"],
+            "headline-sm": ["Plus Jakarta Sans", "sans-serif"]
+          },
+          fontSize: {
+            "body-lg": ["16px", { lineHeight: "24px", fontWeight: "400" }],
+            "headline-xl-mobile": ["26px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "700" }],
+            "label-lg": ["14px", { lineHeight: "20px", letterSpacing: "0.01em", fontWeight: "600" }],
+            "data-metric": ["28px", { lineHeight: "34px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "body-md": ["14px", { lineHeight: "20px", fontWeight: "400" }],
+            "headline-xl": ["32px", { lineHeight: "40px", letterSpacing: "-0.02em", fontWeight: "700" }],
+            "headline-md": ["20px", { lineHeight: "28px", letterSpacing: "-0.01em", fontWeight: "600" }],
+            "headline-lg": ["24px", { lineHeight: "32px", letterSpacing: "-0.015em", fontWeight: "600" }],
+            "label-sm": ["11px", { lineHeight: "14px", letterSpacing: "0.03em", fontWeight: "500" }],
+            "label-md": ["12px", { lineHeight: "16px", letterSpacing: "0.02em", fontWeight: "600" }],
+            "body-sm": ["12px", { lineHeight: "18px", fontWeight: "400" }],
+            "headline-sm": ["16px", { lineHeight: "24px", fontWeight: "600" }]
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .material-symbols-outlined {
+      font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      display: inline-block;
+      vertical-align: middle;
+      line-height: 1;
+    }
+    .material-symbols-outlined.fill {
+      font-variation-settings: 'FILL' 1;
+    }
+    .custom-shadow-card, .card-shadow {
+      box-shadow: 0 1px 3px rgba(32, 43, 67, 0.04), 0 6px 16px -4px rgba(32, 43, 67, 0.06);
+    }
+    .custom-shadow-float {
+      box-shadow: 0 4px 6px rgba(32, 43, 67, 0.03), 0 12px 24px -6px rgba(32, 43, 67, 0.08);
+    }
+    @keyframes pulse-ring {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.15); opacity: 0.4; }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+    .pulse-indicator {
+      animation: pulse-ring 2.4s ease-in-out infinite;
+    }
+    .rtl-text {
+      direction: rtl;
+      text-align: right;
+      font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", "Noto Nastaliq Urdu", sans-serif;
+      line-height: 1.9;
+    }
+    @media print {
+      aside, header, #modal-root { display: none !important; }
+      #workspace-shell { margin-left: 0 !important; padding-left: 0 !important; }
+    }
+  </style>
 </head>
-<body>
-  <!-- Top Bar -->
-  <header class="topbar">
-    <div class="brand">
-      <div class="brand-icon">CL</div>
-      <div>
-        <h1>CityLab Diagnostics — AI Report Explainer</h1>
-        <div class="brand-sub">Grounded Corpus Classification • Unit Conversion • Privacy Context-Lock • No Diagnosis</div>
+<body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+  <!-- ================= PERSISTENT LEFT SIDEBAR DOCK (Teammate Stitch Design) ================= -->
+  <aside class="fixed top-0 left-0 h-screen w-64 flex flex-col justify-between bg-surface-container-lowest border-r border-outline-variant/30 shadow-sm z-30 shrink-0">
+    <div class="p-4 flex flex-col">
+      <!-- Brand Anchor -->
+      <div class="flex items-center gap-3 px-2 py-3 mb-4 cursor-pointer" data-nav-view="dashboard">
+        <div class="w-10 h-10 rounded-DEFAULT bg-primary text-on-primary flex items-center justify-center font-headline-md text-headline-md font-bold shadow-sm shadow-primary/20">
+          <span class="material-symbols-outlined text-white fill">biotech</span>
+        </div>
+        <div class="flex flex-col">
+          <span class="font-headline-md text-headline-md font-bold text-primary tracking-tight">CityLab</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant font-normal leading-none mt-0.5">Diagnostic AI Suite</span>
+        </div>
       </div>
+
+      <!-- Quick CTA Button -->
+      <button id="sidebar-new-analysis" class="mb-4 flex items-center justify-center gap-2 py-2.5 px-4 bg-primary text-on-primary rounded-full font-label-md text-label-md font-semibold hover:bg-on-primary-fixed-variant transition-colors shadow-sm active:scale-[0.98]">
+        <span class="material-symbols-outlined text-[18px]">add_circle</span>
+        <span>New Analysis</span>
+      </button>
+
+      <!-- Primary Navigation Links -->
+      <nav class="flex flex-col gap-1" id="sidebar-nav">
+        <a data-nav-view="dashboard" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT bg-surface-container text-primary font-semibold transition-all duration-150 cursor-pointer">
+          <span class="material-symbols-outlined text-primary fill">dashboard</span>
+          <span class="font-label-md text-label-md">Dashboard</span>
+        </a>
+        <a data-nav-view="patients" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT text-on-surface-variant font-normal hover:bg-surface-container-low hover:text-on-surface transition-all duration-150 cursor-pointer">
+          <span class="material-symbols-outlined">people</span>
+          <span class="font-label-md text-label-md">Patients (14)</span>
+        </a>
+        <a data-nav-view="analyze-report" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT text-on-surface-variant font-normal hover:bg-surface-container-low hover:text-on-surface transition-all duration-150 cursor-pointer">
+          <span class="material-symbols-outlined">upload_file</span>
+          <span class="font-label-md text-label-md">Analyze Report</span>
+        </a>
+        <a data-nav-view="analysis-results" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT text-on-surface-variant font-normal hover:bg-surface-container-low hover:text-on-surface transition-all duration-150 cursor-pointer">
+          <span class="material-symbols-outlined">biotech</span>
+          <span class="font-label-md text-label-md">Analysis Results</span>
+        </a>
+        <a data-nav-view="ai-assistant" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT text-on-surface-variant font-normal hover:bg-surface-container-low hover:text-on-surface transition-all duration-150 cursor-pointer">
+          <span class="material-symbols-outlined">smart_toy</span>
+          <span class="font-label-md text-label-md">AI Assistant</span>
+        </a>
+        <a data-nav-view="how-it-works" class="nav-item flex items-center gap-3 px-3 py-2.5 rounded-DEFAULT text-on-surface-variant font-normal hover:bg-surface-container-low hover:text-on-surface transition-all duration-150 cursor-pointer">
+          <span class="material-symbols-outlined">help_outline</span>
+          <span class="font-label-md text-label-md">How It Works</span>
+        </a>
+      </nav>
     </div>
 
-    <div class="topbar-controls">
-      <!-- Language Toggle (Bonus Feature) -->
-      <div class="seg-group" role="group" aria-label="Explanation Language Toggle">
-        <button class="seg-btn active" data-lang-btn="en" title="Plain English (Class-8)">EN — English</button>
-        <button class="seg-btn" data-lang-btn="ur" title="Urdu Script (اردو)">اردو — Urdu</button>
-        <button class="seg-btn" data-lang-btn="ro-ur" title="Roman Urdu">Roman Urdu</button>
-      </div>
-
-      <!-- Bonus Action Buttons -->
-      <button class="btn" id="btn-tts" title="Read report explanation aloud">
-        🔊 <span id="btn-tts-label">Read Aloud</span>
-      </button>
-      <button class="btn" id="btn-export" title="Export or print Doctor Visit Checklist">
-        📄 <span id="btn-export-label">Doctor Visit Sheet</span>
-      </button>
-      <button class="btn btn-primary" id="btn-audit" title="Verify all 14 corpus reports & 5 checkpoints live">
-        ✅ <span id="btn-audit-label">14/14 Audit</span>
-      </button>
-
-      <!-- Backend Status Pill -->
-      <div class="status-pill" title="Backend & LLM pipeline status">
-        <span class="dot" id="health-dot"></span>
-        <span id="health-text">Checking API...</span>
+    <!-- Bottom Footer Dock -->
+    <div class="p-4 border-t border-outline-variant/30 flex flex-col gap-2">
+      <nav class="flex flex-col gap-0.5 mb-2">
+        <button id="btn-audit-sidebar" class="w-full flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-primary font-semibold hover:bg-surface-container-low transition-colors duration-150 text-left">
+          <span class="material-symbols-outlined text-[18px]">fact_check</span>
+          <span class="font-label-md text-label-md">Live 14/14 Audit</span>
+        </button>
+        <a href="/docs" target="_blank" class="flex items-center gap-3 px-3 py-2 rounded-DEFAULT text-on-surface-variant font-normal hover:bg-surface-container-low hover:text-on-surface transition-colors duration-150">
+          <span class="material-symbols-outlined text-[18px]">api</span>
+          <span class="font-label-md text-label-md">OpenAPI Docs</span>
+        </a>
+      </nav>
+      <!-- Soft Clinical Safety Box -->
+      <div class="bg-surface-container-low p-3 rounded-DEFAULT border border-outline-variant/40 flex items-start gap-2.5">
+        <span class="material-symbols-outlined text-secondary text-[18px] shrink-0 mt-0.5">verified_user</span>
+        <div>
+          <p class="font-label-sm text-label-sm text-on-surface font-semibold leading-tight">CityLab AI v1.1</p>
+          <p class="font-body-sm text-body-sm text-on-surface-variant text-[11px] leading-snug mt-0.5">Context-locked corpus verification active.</p>
+        </div>
       </div>
     </div>
-  </header>
+  </aside>
 
-  <!-- Main 3-Column Workspace -->
-  <main class="workspace">
-    <!-- Left Column: Patient List + Custom Report Paste -->
-    <aside class="left-col" style="display:flex; flex-direction:column; gap:1rem;">
-      <section class="panel">
-        <div class="panel-header">
-          <h2 id="sidebar-patients-title">Corpus Patients (14)</h2>
+  <!-- ================= MAIN OPERATIONAL WORKSPACE (Offset 256px) ================= -->
+  <div id="workspace-shell" class="ml-64 flex-1 flex flex-col min-w-0 min-h-screen">
+    <!-- Top Persistent Bar -->
+    <header class="sticky top-0 h-16 w-full bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/30 px-6 lg:px-8 flex items-center justify-between gap-4 z-20">
+      <!-- Left: Breadcrumb & Global Search -->
+      <div class="flex items-center gap-5 flex-1 max-w-2xl">
+        <div class="flex items-center gap-2 text-on-surface-variant font-body-sm text-body-sm shrink-0">
+          <span class="font-headline-sm text-headline-sm font-bold text-on-surface cursor-pointer" data-nav-view="dashboard">CityLab</span>
+          <span class="material-symbols-outlined text-[16px] text-outline">chevron_right</span>
+          <span id="breadcrumb-current" class="text-primary font-semibold">Dashboard</span>
         </div>
-        <div class="panel-body">
-          <input type="search" id="patient-search" class="search-input" placeholder="Search P001–P014 or name..." aria-label="Search patients" />
-          <div class="chip-row">
-            <button class="filter-chip active" data-filter-chip="all">All (14)</button>
-            <button class="filter-chip" data-filter-chip="urgent">🚨 Urgent</button>
-            <button class="filter-chip" data-filter-chip="demo">❓ Missing Info</button>
-            <button class="filter-chip" data-filter-chip="conv">🔄 Unit/Alias</button>
-            <button class="filter-chip" data-filter-chip="unknown">❔ Unknown</button>
-          </div>
-          <div id="patient-list" class="patient-list"></div>
+        <!-- Search Bar -->
+        <div class="relative w-full max-w-sm hidden md:block">
+          <span class="material-symbols-outlined absolute left-3.5 top-1/2 -translate-y-1/2 text-outline text-[18px]">search</span>
+          <input id="global-patient-search" class="w-full pl-10 pr-4 py-1.5 bg-surface-container-low rounded-full border border-outline-variant/40 focus:border-tertiary focus:bg-white text-on-surface font-body-sm text-body-sm placeholder:text-outline outline-none transition-all" placeholder="Jump to patient name or ID (P001–P014)..." type="text" />
         </div>
-      </section>
-
-      <section class="panel">
-        <div class="panel-header">
-          <h2 id="sidebar-paste-title">Paste / Upload Report</h2>
-          <button class="btn" id="btn-load-sample" style="font-size:0.74rem; padding:0.25rem 0.55rem;">Load Tricky Sample</button>
-        </div>
-        <div class="panel-body">
-          <textarea id="custom-report-input" class="report-textarea" placeholder="Paste any raw lab report text (even with CLIA/HIPAA boilerplate) or upload a .md/.txt file..."></textarea>
-          <div class="char-counter">
-            <span id="char-count">0 / 200,000 chars</span>
-            <label style="cursor:pointer; color:var(--primary-dark); font-weight:600;">
-              📎 Upload .md/.txt
-              <input type="file" id="file-upload" accept=".md,.txt" style="display:none;" />
-            </label>
-          </div>
-          <button class="btn btn-primary" id="btn-analyze-custom" style="width:100%; justify-content:center;">
-            🔬 Analyze Pasted Report
-          </button>
-        </div>
-      </section>
-    </aside>
-
-    <!-- Center Column: Analysis Results -->
-    <section id="main-content" aria-live="polite"></section>
-
-    <!-- Right Column: Context-Locked Patient Chat -->
-    <aside class="chat-col panel">
-      <div class="panel-header">
-        <h2 id="chat-title">Patient Context-Locked Chat</h2>
       </div>
-      <div class="panel-body">
-        <div id="chat-messages" class="chat-messages"></div>
 
-        <div class="chip-row" style="margin-top:0.6rem; margin-bottom:0.35rem;">
-          <button class="filter-chip" data-quick-chat="Explain my test results in simple words.">Explain my results</button>
-          <button class="filter-chip" data-quick-chat="What does SGPT and FBS mean in the glossary?">Glossary check</button>
-          <button class="filter-chip" data-quick-chat="Show me Diana Prince's (P004) hemoglobin results." title="Tests Rule 1 Privacy Refusal">🔒 Privacy Red-Team Test</button>
+      <!-- Right: Language Toggle, Bonus Actions, Live Backend Status & Active Patient Pill -->
+      <div class="flex items-center gap-3 shrink-0">
+        <!-- Bonus Feature: Multilingual Toggle (EN / Urdu / Roman Urdu) -->
+        <div class="inline-flex p-0.5 bg-surface-container-low rounded-full border border-outline-variant/40" role="group" aria-label="Language Toggle">
+          <button data-lang-btn="en" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold bg-primary text-on-primary transition-all">EN</button>
+          <button data-lang-btn="ur" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all">اردو</button>
+          <button data-lang-btn="ro-ur" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all">Roman Urdu</button>
         </div>
 
-        <form id="chat-form" class="chat-form">
-          <input type="text" id="chat-input" placeholder="Ask about this patient's results..." maxlength="1000" aria-label="Ask a question about this report" />
-          <button type="submit" class="btn btn-primary" id="chat-send-btn">Send</button>
-        </form>
-      </div>
-    </aside>
-  </main>
+        <!-- Read Aloud TTS Button -->
+        <button id="btn-tts" class="hidden sm:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-surface-container-lowest border border-outline-variant/40 hover:bg-surface-container-low font-label-sm text-label-sm font-semibold text-on-surface transition-colors" title="Read Report Aloud">
+          <span class="material-symbols-outlined text-[16px] text-primary">volume_up</span>
+          <span id="btn-tts-label">Listen</span>
+        </button>
 
-  <!-- Modal Root (Export & Live Audit) -->
-  <div id="modal-root" class="modal-backdrop" style="display:none;"></div>
+        <!-- Live Backend Status Pill -->
+        <div class="flex items-center gap-2 px-3 py-1.5 bg-surface-container-lowest rounded-full border border-outline-variant/40 shadow-xs">
+          <span class="relative flex h-2.5 w-2.5">
+            <span id="health-ping" class="pulse-indicator absolute inline-flex h-full w-full rounded-full bg-primary-container opacity-75"></span>
+            <span id="health-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-[#209B72]"></span>
+          </span>
+          <span id="health-text" class="font-label-sm text-label-sm font-semibold text-on-surface">Backend: Connected</span>
+        </div>
+
+        <!-- Active Patient Context Pill -->
+        <button id="header-patient-pill" class="hidden xl:flex items-center gap-2 px-3 py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-on-surface border border-outline-variant/30 transition-colors">
+          <span class="material-symbols-outlined text-primary text-[18px]">person</span>
+          <span id="header-patient-label" class="font-label-sm text-label-sm font-semibold">Patient: Diana Prince (P004)</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Dynamic View Container -->
+    <div id="view-root" class="flex-1 flex flex-col"></div>
+  </div>
+
+  <!-- Modal Root (Printable Doctor Visit Sheet & Live 14/14 Audit) -->
+  <div id="modal-root" class="fixed inset-0 bg-on-surface/50 backdrop-blur-sm z-50 hidden place-items-center p-4"></div>
 
   <script type="module" src="/assets/app.js"></script>
 </body>
