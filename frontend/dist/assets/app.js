@@ -304,12 +304,9 @@ function renderDashboardView() {
             <div class="relative w-60 h-60 flex items-center justify-center">
               <div class="absolute inset-0 rounded-full border border-white/15 border-dashed animate-spin" style="animation-duration: 40s;"></div>
               <div class="absolute inset-4 rounded-full border border-white/15"></div>
-              <div class="relative z-10 w-44 h-44 rounded-full bg-white/10 backdrop-blur-md border border-white/25 flex flex-col items-center justify-center p-4 text-center shadow-inner">
-                <div class="w-14 h-14 rounded-full bg-white/20 flex items-center justify-center mb-2">
-                  <span class="material-symbols-outlined text-white text-[32px] fill">biotech</span>
-                </div>
-                <span class="font-headline-sm text-headline-sm font-bold text-white leading-tight">CityLab AI</span>
-                <span class="font-body-sm text-body-sm text-primary-fixed mt-0.5">Biomarker Decoder</span>
+              <div class="relative z-10 w-44 h-44 rounded-full bg-white border border-white/40 flex flex-col items-center justify-center p-4 text-center shadow-lg">
+                <img src="/assets/logo.jpg" alt="CityLab Diagnostic AI Suite" class="w-36 object-contain mb-1" />
+                <span class="font-body-sm text-body-sm text-primary font-semibold mt-0.5">Biomarker Decoder</span>
               </div>
             </div>
           </div>
