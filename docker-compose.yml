@@ -1,0 +1,18 @@
+services:
+  citylab-explainer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: citylab-explainer:latest
+    container_name: citylab-explainer
+    ports:
+      - "8000:8000"
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      - LLM_PROVIDER_ORDER=${LLM_PROVIDER_ORDER:-gemini,groq,openrouter}
+      - GEMINI_API_KEY=${GEMINI_API_KEY:-}
+      - GROQ_API_KEY=${GROQ_API_KEY:-}
+      - OPENROUTER_API_KEY=${OPENROUTER_API_KEY:-}
+    restart: unless-stopped
