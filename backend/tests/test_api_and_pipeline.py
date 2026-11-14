@@ -127,4 +127,36 @@ def test_api_endpoints_and_error_contracts():
             r = await ac.post("/api/analyze", json={"patient_id": "P999"})
             assert r.status_code == 404 and r.json()["error"]["code"] == "PATIENT_NOT_FOUND"
 
+            # Bonus 1: Language toggle (Urdu 'ur' and Roman Urdu 'ro-ur')
+            r_ur = await ac.post("/api/analyze", json={"patient_id": "P004", "lang": "ur"})
+            b_ur = r_ur.json()
+            assert r_ur.status_code == 200 and b_ur["lang"] == "ur"
+            assert "ہیموگلوبن" in b_ur["results"][0]["explanation"]
+            assert "تشخیص نہیں" in b_ur["disclaimer"]
+
+            r_ro = await ac.post("/api/analyze", json={"patient_id": "P004", "lang": "ro-ur"})
+            b_ro = r_ro.json()
+            assert r_ro.status_code == 200 and b_ro["lang"] == "ro-ur"
+            assert "khoon" in b_ro["results"][0]["explanation"].lower()
+
+            # Bonus 2: What-If simulator
+            r_sim = await ac.post(
+                "/api/simulate",
+                json={"test": "FBS", "value": 5.0, "unit": "mmol/L", "age": 50, "sex": "male", "lang": "en"},
+            )
+            assert r_sim.status_code == 200
+            assert r_sim.json()["result"]["value"] == 90.0
+            assert r_sim.json()["result"]["status"] == "normal"
+
+            # Bonus 3: Printable Markdown export
+            r_exp = await ac.post("/api/export", json={"patient_id": "P005", "lang": "en"})
+            assert r_exp.status_code == 200 and "## Questions to Ask Your Doctor" in r_exp.json()["markdown"]
+
+            # Bonus 4: Live 14-patient & 5-checkpoint self-audit
+            r_aud = await ac.get("/api/audit")
+            aud = r_aud.json()
+            assert r_aud.status_code == 200
+            assert aud["passed_patients"] == 14 and aud["score_pct"] == 100.0
+            assert all(cp["passed"] for cp in aud["checkpoints"])
+
     asyncio.run(_run())

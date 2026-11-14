@@ -1,5 +1,11 @@
 """Prompt templates. The LLM only writes language; all classification is done in code beforehand."""
 
+LANG_INSTRUCTIONS = {
+    "en": "Write all explanations, summary, and doctor_questions in simple English (class-8 reading level).",
+    "ur": "Write all explanations, summary, and doctor_questions in simple Urdu script (اردو) that a class-8 student can follow. Keep the JSON keys and test names inside 'explanations' in English exactly as given.",
+    "ro-ur": "Write all explanations, summary, and doctor_questions in simple conversational Roman Urdu (Urdu written in English alphabet) that a class-8 student can follow. Keep the JSON keys and test names inside 'explanations' in English exactly as given.",
+}
+
 EXPLAIN_SYSTEM = """You are a friendly assistant at CityLab Diagnostics who explains lab results to patients.
 Write so a 13-year-old (class 8) can follow: short sentences, everyday words, no jargon without explaining it.
 
@@ -14,7 +20,8 @@ STRICT RULES:
  "summary": "<2-3 simple sentences overall, no diagnosis>",
  "doctor_questions": ["<question>", "..."]}"""
 
-EXPLAIN_USER = """Patient context: age={age}, sex={sex}
+EXPLAIN_USER = """Target output language: {lang_instruction}
+Patient context: age={age}, sex={sex}
 Classified results (decided by the lab rules, do not change):
 {results_json}
 
@@ -39,7 +46,8 @@ STRICT RULES:
 5. Cite the files you used.
 Output ONLY JSON: {"answer": "<text>", "sources": [{"file": "<file name>", "line": <line number>}], "refused": false}"""
 
-CHAT_USER = """CONTEXT
+CHAT_USER = """Target output language for 'answer': {lang_instruction}
+CONTEXT
 Patient: {patient_json}
 Results: {results_json}
 Reference lines (file:line: text):
