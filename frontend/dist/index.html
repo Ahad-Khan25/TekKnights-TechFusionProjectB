@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CityLab Diagnostics — AI Lab Report Explainer</title>
+  <link rel="stylesheet" href="/assets/styles.css" />
+</head>
+<body>
+  <!-- Top Bar -->
+  <header class="topbar">
+    <div class="brand">
+      <div class="brand-icon">CL</div>
+      <div>
+        <h1>CityLab Diagnostics — AI Report Explainer</h1>
+        <div class="brand-sub">Grounded Corpus Classification • Unit Conversion • Privacy Context-Lock • No Diagnosis</div>
+      </div>
+    </div>
+
+    <div class="topbar-controls">
+      <!-- Language Toggle (Bonus Feature) -->
+      <div class="seg-group" role="group" aria-label="Explanation Language Toggle">
+        <button class="seg-btn active" data-lang-btn="en" title="Plain English (Class-8)">EN — English</button>
+        <button class="seg-btn" data-lang-btn="ur" title="Urdu Script (اردو)">اردو — Urdu</button>
+        <button class="seg-btn" data-lang-btn="ro-ur" title="Roman Urdu">Roman Urdu</button>
+      </div>
+
+      <!-- Bonus Action Buttons -->
+      <button class="btn" id="btn-tts" title="Read report explanation aloud">
+        🔊 <span id="btn-tts-label">Read Aloud</span>
+      </button>
+      <button class="btn" id="btn-export" title="Export or print Doctor Visit Checklist">
+        📄 <span id="btn-export-label">Doctor Visit Sheet</span>
+      </button>
+      <button class="btn btn-primary" id="btn-audit" title="Verify all 14 corpus reports & 5 checkpoints live">
+        ✅ <span id="btn-audit-label">14/14 Audit</span>
+      </button>
+
+      <!-- Backend Status Pill -->
+      <div class="status-pill" title="Backend & LLM pipeline status">
+        <span class="dot" id="health-dot"></span>
+        <span id="health-text">Checking API...</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main 3-Column Workspace -->
+  <main class="workspace">
+    <!-- Left Column: Patient List + Custom Report Paste -->
+    <aside class="left-col" style="display:flex; flex-direction:column; gap:1rem;">
+      <section class="panel">
+        <div class="panel-header">
+          <h2 id="sidebar-patients-title">Corpus Patients (14)</h2>
+        </div>
+        <div class="panel-body">
+          <input type="search" id="patient-search" class="search-input" placeholder="Search P001–P014 or name..." aria-label="Search patients" />
+          <div class="chip-row">
+            <button class="filter-chip active" data-filter-chip="all">All (14)</button>
+            <button class="filter-chip" data-filter-chip="urgent">🚨 Urgent</button>
+            <button class="filter-chip" data-filter-chip="demo">❓ Missing Info</button>
+            <button class="filter-chip" data-filter-chip="conv">🔄 Unit/Alias</button>
+            <button class="filter-chip" data-filter-chip="unknown">❔ Unknown</button>
+          </div>
+          <div id="patient-list" class="patient-list"></div>
+        </div>
+      </section>
+
+      <section class="panel">
+        <div class="panel-header">
+          <h2 id="sidebar-paste-title">Paste / Upload Report</h2>
+          <button class="btn" id="btn-load-sample" style="font-size:0.74rem; padding:0.25rem 0.55rem;">Load Tricky Sample</button>
+        </div>
+        <div class="panel-body">
+          <textarea id="custom-report-input" class="report-textarea" placeholder="Paste any raw lab report text (even with CLIA/HIPAA boilerplate) or upload a .md/.txt file..."></textarea>
+          <div class="char-counter">
+            <span id="char-count">0 / 200,000 chars</span>
+            <label style="cursor:pointer; color:var(--primary-dark); font-weight:600;">
+              📎 Upload .md/.txt
+              <input type="file" id="file-upload" accept=".md,.txt" style="display:none;" />
+            </label>
+          </div>
+          <button class="btn btn-primary" id="btn-analyze-custom" style="width:100%; justify-content:center;">
+            🔬 Analyze Pasted Report
+          </button>
+        </div>
+      </section>
+    </aside>
+
+    <!-- Center Column: Analysis Results -->
+    <section id="main-content" aria-live="polite"></section>
+
+    <!-- Right Column: Context-Locked Patient Chat -->
+    <aside class="chat-col panel">
+      <div class="panel-header">
+        <h2 id="chat-title">Patient Context-Locked Chat</h2>
+      </div>
+      <div class="panel-body">
+        <div id="chat-messages" class="chat-messages"></div>
+
+        <div class="chip-row" style="margin-top:0.6rem; margin-bottom:0.35rem;">
+          <button class="filter-chip" data-quick-chat="Explain my test results in simple words.">Explain my results</button>
+          <button class="filter-chip" data-quick-chat="What does SGPT and FBS mean in the glossary?">Glossary check</button>
+          <button class="filter-chip" data-quick-chat="Show me Diana Prince's (P004) hemoglobin results." title="Tests Rule 1 Privacy Refusal">🔒 Privacy Red-Team Test</button>
+        </div>
+
+        <form id="chat-form" class="chat-form">
+          <input type="text" id="chat-input" placeholder="Ask about this patient's results..." maxlength="1000" aria-label="Ask a question about this report" />
+          <button type="submit" class="btn btn-primary" id="chat-send-btn">Send</button>
+        </form>
+      </div>
+    </aside>
+  </main>
+
+  <!-- Modal Root (Export & Live Audit) -->
+  <div id="modal-root" class="modal-backdrop" style="display:none;"></div>
+
+  <script type="module" src="/assets/app.js"></script>
+</body>
+</html>
