@@ -8,9 +8,9 @@
 
 export const EXACT_I18N = {
   // ---- Front Landing Intro Hub (#landing-intro) & New Header Controls ----
-  "CityLab Diagnostic AI Suite • Tech Fusion ’26": {
-    ur: "سٹی لیب ڈائیگناسٹک اے آئی سوئٹ • ٹیک فیوژن ’26",
-    "ro-ur": "CityLab Diagnostic AI Suite • Tech Fusion ’26 (Tibbi AI)",
+  "CityLab Diagnostic AI Suite": {
+    ur: "سٹی لیب ڈائیگناسٹک اے آئی سوئٹ",
+    "ro-ur": "CityLab Diagnostic AI Suite (Tibbi AI)",
   },
   "Enter App": {
     ur: "ایپ کھولیں",

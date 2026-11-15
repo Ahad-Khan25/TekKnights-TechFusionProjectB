@@ -1,6 +1,6 @@
-import { SEED_PATIENTS, TRICKY_SAMPLE_REPORT } from "./mocks.js?v=6";
-import { translateDOM } from "./i18n.js?v=6";
-import { initDemoPlayer, startDemoMode } from "./demo.js?v=6";
+import { SEED_PATIENTS, TRICKY_SAMPLE_REPORT } from "./mocks.js?v=7";
+import { translateDOM } from "./i18n.js?v=7";
+import { initDemoPlayer, startDemoMode } from "./demo.js?v=7";
 
 const API_BASE = window.VITE_API_BASE_URL || "";
 
@@ -1908,7 +1908,7 @@ function renderDisclaimerFooter() {
         </p>
       </div>
       <div class="font-body-sm text-body-sm text-outline flex items-center gap-3">
-        <span>CityLab Diagnostics AI • Tech Fusion ’26</span>
+        <span>CityLab Diagnostic AI Suite</span>
       </div>
     </footer>
   `;

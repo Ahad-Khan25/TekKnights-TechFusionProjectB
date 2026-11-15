@@ -1,6 +1,6 @@
 /**
  * Automated Guided Demo Player with Burned-In Teleprompter Subtitles & 1-Click Tab Video Recorder
- * Drives all 12 scenes of CityLab Diagnostics live for the Tech Fusion '26 demo video.
+ * Drives all 12 scenes of CityLab Diagnostics live for the demo video.
  */
 
 export const DEMO_SCENES = [
@@ -9,7 +9,7 @@ export const DEMO_SCENES = [
     durationMs: 9000,
     title: "1. Overview & Architecture",
     subtitle:
-      "Welcome to CityLab Diagnostic AI Suite — built for Tech Fusion '26. We combine a deterministic Python clinical rule engine with a multi-provider LLM explainer across 14 patient reports and 6 reference files.",
+      "Welcome to CityLab Diagnostic AI Suite. We combine a deterministic Python clinical rule engine with a multi-provider LLM explainer across 14 patient reports and 6 reference files.",
     action: async (ctx) => {
       ctx.closeModal();
       ctx.setLang("en", true);
@@ -353,7 +353,7 @@ async function toggleTabRecording() {
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = "CityLab-TechFusion26-Demo-With-Subtitles.webm";
+      a.download = "CityLab-Demo-With-Subtitles.webm";
       a.click();
       demoState.recording = false;
       const btn = document.getElementById("demo-rec-btn");
