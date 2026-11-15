@@ -1385,18 +1385,17 @@ export const REGEX_I18N = [
 
 export function translateString(raw, lang) {
   if (!raw || lang === "en") return raw;
-  const trimmed = raw.trim();
+  const trimmed = raw.replace(/\s+/g, " ").trim();
   if (!trimmed) return raw;
 
   const exact = EXACT_I18N[trimmed];
   if (exact && exact[lang]) {
-    return raw.replace(trimmed, exact[lang]);
+    return exact[lang];
   }
 
   for (const rule of REGEX_I18N) {
     if (rule.re.test(trimmed) && rule[lang]) {
-      const replaced = trimmed.replace(rule.re, rule[lang]);
-      return raw.replace(trimmed, replaced);
+      return trimmed.replace(rule.re, rule[lang]);
     }
   }
   return raw;
@@ -1444,12 +1443,12 @@ export function translateDOM(root, lang) {
 
   for (const node of nodes) {
     const val = node.nodeValue || "";
-    if (!val.trim()) continue;
-    // If the node was dynamically updated by JS (e.g., health status or breadcrumb), refresh __origText when in EN or when it matches an English pattern
-    const trimmed = val.trim();
+    const trimmed = val.replace(/\s+/g, " ").trim();
+    if (!trimmed) continue;
+    // Refresh __origText when first seen or when dynamically updated with a known English string
     if (
       node.__origText === undefined ||
-      (EXACT_I18N[trimmed] !== undefined) ||
+      EXACT_I18N[trimmed] !== undefined ||
       REGEX_I18N.some((r) => r.re.test(trimmed))
     ) {
       node.__origText = val;

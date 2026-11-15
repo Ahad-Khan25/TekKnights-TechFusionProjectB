@@ -54,6 +54,8 @@ async def log_requests(request: Request, call_next):
     ms = int((time.perf_counter() - t0) * 1000)
     if request.url.path.startswith("/api"):
         log.info("http %s %s status=%d latency_ms=%d", request.method, request.url.path, response.status_code, ms)
+    else:
+        response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate"
     response.headers["X-Request-ID"] = request.state.request_id
     return response
 
