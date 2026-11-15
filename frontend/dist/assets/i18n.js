@@ -7,6 +7,172 @@
  */
 
 export const EXACT_I18N = {
+  // ---- Front Landing Intro Hub (#landing-intro) & New Header Controls ----
+  "CityLab Diagnostic AI Suite • Tech Fusion ’26": {
+    ur: "سٹی لیب ڈائیگناسٹک اے آئی سوئٹ • ٹیک فیوژن ’26",
+    "ro-ur": "CityLab Diagnostic AI Suite • Tech Fusion ’26 (Tibbi AI)",
+  },
+  "Enter App": {
+    ur: "ایپ کھولیں",
+    "ro-ur": "App Kholein",
+  },
+  "Intro Hub": {
+    ur: "تعارفی صفحہ",
+    "ro-ur": "Taarufi Safha",
+  },
+  "Demo Video": {
+    ur: "ڈیمو ویڈیو",
+    "ro-ur": "Demo Video Chalayein",
+  },
+  "100% Grounded Clinical RAG • Multi-Format OCR (PDF, Image, DOCX, CSV) • Multilingual": {
+    ur: "100% تصدیق شدہ کلینیکل سسٹم • ملٹی فارمیٹ (PDF، تصویر، DOCX، CSV) • کثیر اللسانی",
+    "ro-ur": "100% Tasdeeq Shuda Clinical System • Multi-Format OCR (PDF, Tasweer, DOCX, CSV) • 3 Zabanein",
+  },
+  "Understand Your Laboratory Reports with Confidence": {
+    ur: "اپنی لیبارٹری رپورٹس کو مکمل اعتماد اور آسانی کے ساتھ سمجھیں",
+    "ro-ur": "Apni Laboratory Reports ko Etemad aur Asani ke Sath Samjhein",
+  },
+  "Select any module below to explore patient records, upload or paste a laboratory report, inspect visual biomarker ranges, or consult the context-locked AI assistant.": {
+    ur: "مریضوں کے ریکارڈز دیکھنے، لیب رپورٹ اپ لوڈ یا پیسٹ کرنے، ٹیسٹوں کی بصری رینجز سمجھنے یا اے آئی اسسٹنٹ سے مشورہ کرنے کے لیے نیچے دیے گئے کسی بھی حصے کا انتخاب کریں۔",
+    "ro-ur": "Mareezon ke records dekhne, lab report upload ya paste karne, visual test ranges samajhne, ya context-locked AI assistant se baat karne ke liye neeche kisi bhi module ko chunein.",
+  },
+  Overview: {
+    ur: "مجموعی جائزہ",
+    "ro-ur": "Majmooi Jaiza",
+  },
+  "Cohort summary, urgent triage alerts, featured patient checkpoints, and quick report upload.": {
+    ur: "مریضوں کا خلاصہ، فوری طبی انتباہات، اہم چیک پوائنٹ ریکارڈز اور فوری رپورٹ اپ لوڈ۔",
+    "ro-ur": "Mareezon ka khulasa, urgent triage alerts, ahem patient checkpoints, aur fori report upload.",
+  },
+  "Open Dashboard": {
+    ur: "ڈیش بورڈ کھولیں",
+    "ro-ur": "Dashboard Kholein",
+  },
+  "14 Seeded Reports": {
+    ur: "14 تیار رپورٹس",
+    "ro-ur": "14 Tayyar Reports",
+  },
+  "Patients (P001 – P014)": {
+    ur: "مریضوں کے ریکارڈز (P001 – P014)",
+    "ro-ur": "Mareezon ke Records (P001 – P014)",
+  },
+  "Browse all 14 clinical records filtered by Urgent, Missing Demographics, Unit Conversion, and Boundary cases.": {
+    ur: "فوری خطرے، نامکمل عمر/جنس، یونٹ تبدیلی اور باؤنڈری کیسز کے لحاظ سے تمام 14 ریکارڈز دیکھیں۔",
+    "ro-ur": "Urgent, Missing Age/Sex, Unit Conversion, aur Boundary cases ke mutabiq tamam 14 clinical records dekhein.",
+  },
+  "Browse Patient Directory": {
+    ur: "مریضوں کی فہرست دیکھیں",
+    "ro-ur": "Mareezon ki Fehrist Dekhein",
+  },
+  "PDF • Image • DOCX • CSV": {
+    ur: "پی ڈی ایف • تصویر • ورڈ • سی ایس وی",
+    "ro-ur": "PDF • Tasweer • Word • CSV",
+  },
+  "Upload PDFs, lab photos/scans (Vision OCR), Word docs, CSVs, or paste raw text & calibrate missing demographics.": {
+    ur: "پی ڈی ایف، لیب رپورٹ کی تصویر/اسکین (OCR)، ورڈ فائل، CSV اپ لوڈ کریں یا ٹیکسٹ پیسٹ کریں اور عمر/جنس درج کریں۔",
+    "ro-ur": "PDF, lab report ki photo/scan (Vision OCR), Word doc, CSV upload karein ya raw text paste karein aur missing age/sex dein.",
+  },
+  "Upload or Paste Report": {
+    ur: "رپورٹ اپ لوڈ یا پیسٹ کریں",
+    "ro-ur": "Report Upload ya Paste Karein",
+  },
+  "Flagship Decoder": {
+    ur: "تفصیلی تجزیہ کار",
+    "ro-ur": "Tafseeli Decoder",
+  },
+  "Inspect visual spectrum gauges, Class-8 plain-language explanations, What-If simulator, and Doctor Visit export.": {
+    ur: "بصری رینج اسکیل، آسان زبان میں وضاحت، واٹ-اِف سیمولیٹر اور ڈاکٹر وزٹ شیٹ دیکھیں۔",
+    "ro-ur": "Visual range gauges, asaan zaban mein wazahat, What-If simulator, aur Doctor Visit sheet dekhein.",
+  },
+  "View Live Results": {
+    ur: "نتائج دیکھیں",
+    "ro-ur": "Live Nataij Dekhein",
+  },
+  "Context-Locked": {
+    ur: "پرائیویسی محفوظ",
+    "ro-ur": "Privacy Mehfooz",
+  },
+  "Ask interactive follow-up questions about the active report with strict cross-patient privacy protection.": {
+    ur: "مکمل رازداری کے تحفظ کے ساتھ اپنی موجودہ رپورٹ کے بارے میں سوالات پوچھیں۔",
+    "ro-ur": "Mukammal privacy protection ke sath apni active report ke baray mein sawalat poochein.",
+  },
+  "Start Consultation Chat": {
+    ur: "مشاورتی چیٹ شروع کریں",
+    "ro-ur": "Mashawarti Chat Shuru Karein",
+  },
+  "14/14 Self-Audit": {
+    ur: "14/14 لائیو آڈٹ",
+    "ro-ur": "14/14 Khudkar Audit",
+  },
+  "How It Works & Audit": {
+    ur: "طریقۂ کار اور آڈٹ",
+    "ro-ur": "Tariqa-e-Kaar aur Audit",
+  },
+  "Explore the 4-stage deterministic + LLM hybrid architecture and run the live 14-patient checkpoint verification.": {
+    ur: "4 مرحلہ وار ہائبرڈ سسٹم کو سمجھیں اور تمام 14 مریضوں کا لائیو چیک پوائنٹ آڈٹ چلائیں۔",
+    "ro-ur": "4-stage deterministic + LLM hybrid system dekhein aur live 14-patient checkpoint audit chalayein.",
+  },
+  "Inspect Pipeline & Audit": {
+    ur: "پائپ لائن اور آڈٹ دیکھیں",
+    "ro-ur": "Pipeline aur Audit Dekhein",
+  },
+  "Launch CityLab Dashboard": {
+    ur: "سٹی لیب ڈیش بورڈ کھولیں",
+    "ro-ur": "CityLab Dashboard Kholein",
+  },
+  "Upload Lab Report Now": {
+    ur: "ابھی لیب رپورٹ اپ لوڈ کریں",
+    "ro-ur": "Abhi Lab Report Upload Karein",
+  },
+  "Medical Safety Notice:": {
+    ur: "طبی حفاظتی انتباہ:",
+    "ro-ur": "Tibbi Hifazati Intibah:",
+  },
+  "This is not a diagnosis. Only a licensed doctor can diagnose conditions.": {
+    ur: "یہ طبی تشخیص نہیں ہے۔ صرف مستند ڈاکٹر ہی بیماری کی تشخیص کر سکتا ہے۔",
+    "ro-ur": "Yeh tibbi tashkhees nahi hai. Sirf licensed doctor hi bimari ki tashkhees kar sakta hai.",
+  },
+  "Grounded in 20 Official CityLab Corpus Files": {
+    ur: "سٹی لیب کی 20 سرکاری کارپس فائلوں پر مبنی",
+    "ro-ur": "CityLab ki 20 Official Corpus Files par Mabni",
+  },
+  "PDF, Image (PNG/JPG), DOCX, CSV, or Text": {
+    ur: "پی ڈی ایف، تصویر (PNG/JPG)، ورڈ، CSV یا ٹیکسٹ",
+    "ro-ur": "PDF, Tasweer (PNG/JPG), DOCX, CSV, ya Text",
+  },
+  "Upload PDF, Image, DOCX, CSV, or MD": {
+    ur: "پی ڈی ایف، تصویر، DOCX، CSV یا MD اپ لوڈ کریں",
+    "ro-ur": "PDF, Tasweer, DOCX, CSV, ya MD Upload Karein",
+  },
+  "Multi-Format Input • PDF / Image OCR / DOCX / CSV / Text": {
+    ur: "ملٹی فارمیٹ ان پٹ • پی ڈی ایف / تصویر OCR / ورڈ / CSV / ٹیکسٹ",
+    "ro-ur": "Multi-Format Input • PDF / Tasweer OCR / DOCX / CSV / Text",
+  },
+  "Upload or Paste Laboratory Report": {
+    ur: "لیبارٹری رپورٹ اپ لوڈ یا پیسٹ کریں",
+    "ro-ur": "Laboratory Report Upload ya Paste Karein",
+  },
+  "Click or Drag & Drop Any Lab Report File": {
+    ur: "کوئی بھی لیب رپورٹ فائل اپ لوڈ کرنے کے لیے کلک کریں یا یہاں ڈریگ کریں",
+    "ro-ur": "Koi bhi Lab Report File Upload karne ke liye Click ya Drag & Drop karein",
+  },
+  "Automatic OCR & structured extraction across all formats": {
+    ur: "تمام فارمیٹس سے خودکار OCR اور ڈیٹا اخذ کرنے کی سہولت",
+    "ro-ur": "Tamam formats se automatic OCR aur structured data extraction",
+  },
+  "PNG / JPG / WEBP (Vision OCR)": {
+    ur: "تصویر PNG / JPG / WEBP (ویژن OCR)",
+    "ro-ur": "Tasweer PNG / JPG / WEBP (Vision OCR)",
+  },
+  "Supports PDF • PNG/JPG • DOCX • CSV • MD/TXT": {
+    ur: "سپورٹڈ فارمیٹس: PDF • PNG/JPG • DOCX • CSV • MD/TXT",
+    "ro-ur": "Supported Formats: PDF • PNG/JPG • DOCX • CSV • MD/TXT",
+  },
+  "Analyze Pasted / Extracted Report": {
+    ur: "رپورٹ کا تجزیہ کریں",
+    "ro-ur": "Pasted / Extracted Report Analyze Karein",
+  },
+
   // ---- Sidebar & Top Shell (index.html) ----
   "Diagnostic AI Suite": {
     ur: "ڈائیگناسٹک اے آئی سوئٹ",
@@ -18,7 +184,7 @@ export const EXACT_I18N = {
   },
   Dashboard: {
     ur: "ڈیش بورڈ",
-    "ro-ur": "Dashboard",
+    "ro-ur": "Markazi Dashboard",
   },
   "Patient Directory": {
     ur: "مریضوں کی فہرست",
@@ -38,7 +204,7 @@ export const EXACT_I18N = {
   },
   "AI Assistant": {
     ur: "اے آئی اسسٹنٹ",
-    "ro-ur": "AI Assistant",
+    "ro-ur": "AI Mashawarti Assistant",
   },
   "How It Works": {
     ur: "طریقۂ کار",
