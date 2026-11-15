@@ -13,8 +13,8 @@ import zipfile
 import zlib
 
 from .llm.client import LLMClient, LLMError
-from .parser import parse_report
 from .pipeline import AppError
+from .report_parser import parse_report
 
 log = logging.getLogger("extractor")
 
@@ -331,7 +331,7 @@ async def extract_report_from_file(
         # Check client-extracted text (from PDF.js) or server stdlib PDF stream parser first
         candidate = (client_extracted_text or "").strip() or _extract_pdf_text_stdlib(raw_bytes)
         parsed = parse_report(candidate, fname) if candidate else None
-        if parsed and parsed.tests:
+        if parsed and parsed.results:
             return {"filename": fname, "format": "PDF", "extracted_text": candidate, "method": "pdf_stream_extractor"}
 
         # Fallback to Multimodal Gemini PDF OCR for scanned or font-encoded PDFs
@@ -360,7 +360,7 @@ async def extract_report_from_file(
         img_mime = mtype if mtype.startswith("image/") else f"image/{'jpeg' if ext in ('jpg', 'jpeg') else (ext or 'png')}"
         # Check embedded diagnostic report chunk first (instantaneous & works offline)
         embedded = _extract_image_embedded_text(raw_bytes)
-        if embedded and parse_report(embedded, fname).tests:
+        if embedded and parse_report(embedded, fname).results:
             return {
                 "filename": fname,
                 "format": (ext or "IMAGE").upper(),
