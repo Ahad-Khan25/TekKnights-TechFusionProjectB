@@ -147,13 +147,231 @@
       font-family: "Segoe UI", Tahoma, "Noto Naskh Arabic", "Noto Nastaliq Urdu", sans-serif;
       line-height: 1.9;
     }
+    @keyframes landingFadeUp {
+      0% { opacity: 0; transform: translateY(22px) scale(0.98); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    @keyframes landingFloat {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-6px); }
+    }
+    .landing-anim-hero {
+      animation: landingFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+    }
+    .landing-card {
+      animation: landingFadeUp 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;
+      transition: transform 0.22s ease, box-shadow 0.22s ease, border-color 0.22s ease;
+    }
+    .landing-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 14px 28px -8px rgba(16, 27, 50, 0.12);
+    }
+    .landing-float-badge {
+      animation: landingFloat 3.6s ease-in-out infinite;
+    }
+    #landing-intro {
+      transition: opacity 0.38s cubic-bezier(0.22, 1, 0.36, 1), transform 0.38s cubic-bezier(0.22, 1, 0.36, 1), visibility 0.38s;
+    }
+    #landing-intro.landing-dismissed {
+      opacity: 0;
+      transform: scale(1.02);
+      visibility: hidden;
+      pointer-events: none;
+    }
     @media print {
-      aside, header, #modal-root { display: none !important; }
+      aside, header, #modal-root, #landing-intro { display: none !important; }
       #workspace-shell { margin-left: 0 !important; padding-left: 0 !important; }
     }
   </style>
 </head>
 <body class="bg-surface font-body-md text-on-surface antialiased min-h-screen flex overflow-x-hidden selection:bg-secondary-fixed selection:text-on-secondary-fixed">
+  <!-- ================= FRONT LANDING INTRO OVERLAY ================= -->
+  <div id="landing-intro" class="fixed inset-0 z-50 overflow-y-auto bg-gradient-to-br from-[#F7FAFF] via-[#EEF4FC] to-[#E6F4F2] flex flex-col justify-between p-4 sm:p-8">
+    <!-- Subtle Decorative Clinical Background Rings -->
+    <div class="pointer-events-none fixed -top-24 -right-24 w-96 h-96 rounded-full bg-primary/10 blur-3xl"></div>
+    <div class="pointer-events-none fixed -bottom-24 -left-24 w-96 h-96 rounded-full bg-secondary/10 blur-3xl"></div>
+
+    <!-- Landing Top Bar -->
+    <div class="relative z-10 max-w-6xl w-full mx-auto flex flex-wrap items-center justify-between gap-3 pb-2">
+      <div class="flex items-center gap-3 bg-white/90 backdrop-blur-md px-4 py-2 rounded-full border border-outline-variant/40 shadow-xs">
+        <span class="w-2.5 h-2.5 rounded-full bg-[#209B72] pulse-indicator"></span>
+        <span class="font-label-md text-label-md font-semibold text-on-surface">CityLab Diagnostic AI Suite • Tech Fusion ’26</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <div class="inline-flex p-0.5 bg-white/90 rounded-full border border-outline-variant/40 shadow-xs">
+          <button data-lang-btn="en" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold bg-primary text-on-primary transition-all">EN</button>
+          <button data-lang-btn="ur" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all">اردو</button>
+          <button data-lang-btn="ro-ur" class="px-3 py-1 rounded-full font-label-sm text-label-sm font-semibold text-on-surface-variant hover:text-on-surface transition-all">Roman Urdu</button>
+        </div>
+        <button data-landing-enter="dashboard" class="px-4 py-1.5 rounded-full bg-white hover:bg-surface-container-low text-primary border border-outline-variant/50 font-label-md text-label-md font-bold shadow-xs transition-all flex items-center gap-1">
+          <span>Enter App</span>
+          <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Landing Center Content: Brand Emblem + Animated Option Cards -->
+    <div class="relative z-10 max-w-6xl w-full mx-auto my-auto py-4 sm:py-6 flex flex-col items-center text-center space-y-6">
+      <!-- Brand Hero Card -->
+      <div class="landing-anim-hero flex flex-col items-center max-w-3xl space-y-3">
+        <div class="landing-float-badge bg-white px-6 py-3 rounded-2xl border border-outline-variant/40 shadow-md flex items-center justify-center mb-1">
+          <img src="/assets/logo.jpg" alt="CityLab Diagnostic AI Suite" class="h-14 sm:h-16 object-contain" />
+        </div>
+        <div class="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-primary/10 text-primary font-label-sm text-label-sm font-bold tracking-wide">
+          <span class="material-symbols-outlined text-[15px]">verified</span>
+          <span>100% Grounded Clinical RAG • Multi-Format OCR (PDF, Image, DOCX, CSV) • Multilingual</span>
+        </div>
+        <h1 class="font-headline-xl text-2xl sm:text-4xl font-bold text-on-surface tracking-tight">
+          Understand Your Laboratory Reports with Confidence
+        </h1>
+        <p class="font-body-lg text-sm sm:text-base text-on-surface-variant max-w-2xl leading-relaxed">
+          Select any module below to explore patient records, upload or paste a laboratory report, inspect visual biomarker ranges, or consult the context-locked AI assistant.
+        </p>
+      </div>
+
+      <!-- Animated 5+1 Module Selection Grid -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 w-full text-left">
+        <!-- Option 1: Dashboard -->
+        <div data-landing-enter="dashboard" style="animation-delay: 80ms;" class="landing-card cursor-pointer bg-white/95 backdrop-blur-md rounded-xl p-5 border border-outline-variant/50 hover:border-primary flex flex-col justify-between gap-3 group">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl bg-primary/10 group-hover:bg-primary group-hover:text-white text-primary flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined text-[24px] fill">dashboard</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-bold">Overview</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-headline-md font-bold text-on-surface group-hover:text-primary transition-colors">Dashboard</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+              Cohort summary, urgent triage alerts, featured patient checkpoints, and quick report upload.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-outline-variant/25 flex items-center justify-between font-label-sm text-label-sm font-bold text-primary">
+            <span>Open Dashboard</span>
+            <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Option 2: Patients -->
+        <div data-landing-enter="patients" style="animation-delay: 150ms;" class="landing-card cursor-pointer bg-white/95 backdrop-blur-md rounded-xl p-5 border border-outline-variant/50 hover:border-secondary flex flex-col justify-between gap-3 group">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl bg-secondary/10 group-hover:bg-secondary group-hover:text-white text-secondary flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined text-[24px]">people</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed/50 text-secondary font-label-sm text-label-sm font-bold">14 Seeded Reports</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-headline-md font-bold text-on-surface group-hover:text-secondary transition-colors">Patients (P001 – P014)</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+              Browse all 14 clinical records filtered by Urgent, Missing Demographics, Unit Conversion, and Boundary cases.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-outline-variant/25 flex items-center justify-between font-label-sm text-label-sm font-bold text-secondary">
+            <span>Browse Patient Directory</span>
+            <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Option 3: Analyze Report -->
+        <div data-landing-enter="analyze-report" style="animation-delay: 220ms;" class="landing-card cursor-pointer bg-white/95 backdrop-blur-md rounded-xl p-5 border border-outline-variant/50 hover:border-[#8866CB] flex flex-col justify-between gap-3 group">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl bg-[#8866CB]/12 group-hover:bg-[#8866CB] group-hover:text-white text-[#8866CB] flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined text-[24px]">upload_file</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-[#8866CB]/12 text-[#8866CB] font-label-sm text-label-sm font-bold">PDF • Image • DOCX • CSV</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-headline-md font-bold text-on-surface group-hover:text-[#8866CB] transition-colors">Analyze Report</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+              Upload PDFs, lab photos/scans (Vision OCR), Word docs, CSVs, or paste raw text & calibrate missing demographics.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-outline-variant/25 flex items-center justify-between font-label-sm text-label-sm font-bold text-[#8866CB]">
+            <span>Upload or Paste Report</span>
+            <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Option 4: Analysis Results -->
+        <div data-landing-enter="analysis-results" style="animation-delay: 290ms;" class="landing-card cursor-pointer bg-white/95 backdrop-blur-md rounded-xl p-5 border border-outline-variant/50 hover:border-[#209B72] flex flex-col justify-between gap-3 group">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl bg-[#209B72]/12 group-hover:bg-[#209B72] group-hover:text-white text-[#209B72] flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined text-[24px]">biotech</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-[#209B72]/12 text-[#209B72] font-label-sm text-label-sm font-bold">Flagship Decoder</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-headline-md font-bold text-on-surface group-hover:text-[#209B72] transition-colors">Analysis Results</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+              Inspect visual spectrum gauges, Class-8 plain-language explanations, What-If simulator, and Doctor Visit export.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-outline-variant/25 flex items-center justify-between font-label-sm text-label-sm font-bold text-[#209B72]">
+            <span>View Live Results</span>
+            <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Option 5: AI Assistant -->
+        <div data-landing-enter="ai-assistant" style="animation-delay: 360ms;" class="landing-card cursor-pointer bg-white/95 backdrop-blur-md rounded-xl p-5 border border-outline-variant/50 hover:border-tertiary flex flex-col justify-between gap-3 group">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl bg-tertiary/10 group-hover:bg-tertiary group-hover:text-white text-tertiary flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined text-[24px]">smart_toy</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-tertiary-fixed/50 text-tertiary font-label-sm text-label-sm font-bold">Context-Locked</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-headline-md font-bold text-on-surface group-hover:text-tertiary transition-colors">AI Assistant</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+              Ask interactive follow-up questions about the active report with strict cross-patient privacy protection.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-outline-variant/25 flex items-center justify-between font-label-sm text-label-sm font-bold text-tertiary">
+            <span>Start Consultation Chat</span>
+            <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+
+        <!-- Option 6: How It Works & Live 14/14 Audit -->
+        <div data-landing-enter="how-it-works" style="animation-delay: 430ms;" class="landing-card cursor-pointer bg-white/95 backdrop-blur-md rounded-xl p-5 border border-outline-variant/50 hover:border-[#E99A36] flex flex-col justify-between gap-3 group">
+          <div class="flex items-start justify-between">
+            <div class="w-11 h-11 rounded-xl bg-[#E99A36]/15 group-hover:bg-[#E99A36] group-hover:text-white text-[#E99A36] flex items-center justify-center transition-colors">
+              <span class="material-symbols-outlined text-[24px]">fact_check</span>
+            </div>
+            <span class="px-2.5 py-0.5 rounded-full bg-[#E99A36]/15 text-[#E99A36] font-label-sm text-label-sm font-bold">14/14 Self-Audit</span>
+          </div>
+          <div>
+            <h2 class="font-headline-md text-headline-md font-bold text-on-surface group-hover:text-[#E99A36] transition-colors">How It Works & Audit</h2>
+            <p class="font-body-sm text-body-sm text-on-surface-variant mt-1 leading-relaxed">
+              Explore the 4-stage deterministic + LLM hybrid architecture and run the live 14-patient checkpoint verification.
+            </p>
+          </div>
+          <div class="pt-2 border-t border-outline-variant/25 flex items-center justify-between font-label-sm text-label-sm font-bold text-[#E99A36]">
+            <span>Inspect Pipeline & Audit</span>
+            <span class="material-symbols-outlined text-[16px] group-hover:translate-x-1 transition-transform">arrow_forward</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Primary Launch Button -->
+      <div style="animation-delay: 500ms;" class="landing-card pt-1 flex flex-wrap items-center justify-center gap-3">
+        <button data-landing-enter="dashboard" class="px-7 py-3 rounded-full bg-primary hover:bg-on-primary-fixed-variant text-on-primary font-label-lg text-label-lg font-bold shadow-md flex items-center gap-2 transition-all active:scale-95">
+          <span class="material-symbols-outlined text-[20px]">rocket_launch</span>
+          <span>Launch CityLab Dashboard</span>
+        </button>
+        <button data-landing-enter="analyze-report" class="px-6 py-3 rounded-full bg-white hover:bg-surface-container-low text-secondary border border-outline-variant/60 font-label-lg text-label-lg font-semibold shadow-xs flex items-center gap-2 transition-all active:scale-95">
+          <span class="material-symbols-outlined text-[20px]">cloud_upload</span>
+          <span>Upload Lab Report Now</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Landing Footer -->
+    <div class="relative z-10 max-w-6xl w-full mx-auto pt-2 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-on-surface-variant border-t border-outline-variant/30">
+      <span><strong>Medical Safety Notice:</strong> This is not a diagnosis. Only a licensed doctor can diagnose conditions.</span>
+      <span>Grounded in 20 Official CityLab Corpus Files</span>
+    </div>
+  </div>
+
   <!-- Mobile Sidebar Backdrop Overlay -->
   <div id="sidebar-backdrop" class="fixed inset-0 bg-on-surface/40 backdrop-blur-xs z-30 hidden lg:hidden"></div>
 
@@ -265,6 +483,11 @@
         </button>
 
         <!-- Auto-Play Demo Mode with Subtitles -->
+        <button id="btn-open-intro" class="inline-flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-surface-container-low hover:bg-surface-container text-primary border border-outline-variant/40 font-label-sm text-label-sm font-semibold transition-all" title="Show Animated Intro Hub">
+          <span class="material-symbols-outlined text-[15px] sm:text-[16px]">apps</span>
+          <span>Intro Hub</span>
+        </button>
+
         <button id="btn-demo-mode" class="inline-flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-full bg-secondary text-on-secondary hover:opacity-95 font-label-sm text-label-sm font-bold shadow-xs transition-all" title="Start Automated Video Demo with Subtitles">
           <span class="material-symbols-outlined text-[15px] sm:text-[16px] fill">movie</span>
           <span>Demo Video</span>

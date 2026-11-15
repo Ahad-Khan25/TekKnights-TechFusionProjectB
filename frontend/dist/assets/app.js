@@ -310,8 +310,28 @@ function closeMobileSidebar() {
   if (bd) bd.classList.add("hidden");
 }
 
+function dismissLandingIntro(targetView = null) {
+  const intro = document.getElementById("landing-intro");
+  if (intro) intro.classList.add("landing-dismissed");
+  if (targetView) {
+    setView(targetView);
+  }
+}
+
+function openLandingIntro() {
+  const intro = document.getElementById("landing-intro");
+  if (intro) {
+    intro.classList.remove("landing-dismissed");
+    translateDOM(intro, state.lang);
+  }
+}
+
 function setView(viewName) {
   state.view = viewName;
+  const intro = document.getElementById("landing-intro");
+  if (intro && !intro.classList.contains("landing-dismissed")) {
+    intro.classList.add("landing-dismissed");
+  }
   closeMobileSidebar();
   renderShell();
   renderCurrentView();
@@ -385,10 +405,11 @@ function renderShell() {
     pLabel.textContent = `Patient: ${p.name || "Custom Report"} (${p.patient_id || "Custom"})`;
   }
 
-  // Translate persistent shell (Sidebar + Header + Mobile Nav)
+  // Translate persistent shell (Sidebar + Header + Mobile Nav + Landing Intro)
   translateDOM(document.querySelector("aside"), state.lang);
   translateDOM(document.querySelector("header"), state.lang);
   translateDOM(document.getElementById("mobile-top-nav"), state.lang);
+  translateDOM(document.getElementById("landing-intro"), state.lang);
 }
 
 function computePinPct(r) {
@@ -2360,6 +2381,16 @@ function initShellEvents() {
   const backdrop = document.getElementById("sidebar-backdrop");
   if (backdrop) backdrop.addEventListener("click", closeMobileSidebar);
 
+  // Landing Intro Hub cards & buttons
+  document.querySelectorAll("[data-landing-enter]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const target = el.getAttribute("data-landing-enter") || "dashboard";
+      dismissLandingIntro(target);
+    });
+  });
+  const openIntroBtn = document.getElementById("btn-open-intro");
+  if (openIntroBtn) openIntroBtn.addEventListener("click", openLandingIntro);
+
   // Sidebar & Mobile Top-Nav navigation
   document.querySelectorAll("[data-nav-view]").forEach((el) => {
     el.addEventListener("click", () => setView(el.getAttribute("data-nav-view")));
@@ -2373,7 +2404,12 @@ function initShellEvents() {
   document.getElementById("header-patient-pill").addEventListener("click", () => setView("analysis-results"));
   document.getElementById("btn-tts").addEventListener("click", toggleReadAloud);
   const demoBtn = document.getElementById("btn-demo-mode");
-  if (demoBtn) demoBtn.addEventListener("click", startDemoMode);
+  if (demoBtn) {
+    demoBtn.addEventListener("click", () => {
+      dismissLandingIntro();
+      startDemoMode();
+    });
+  }
 
   // Language toggle buttons
   document.querySelectorAll("[data-lang-btn]").forEach((btn) => {
