@@ -7,11 +7,23 @@ from typing import Literal
 from fastapi import APIRouter, Request
 from pydantic import BaseModel, Field, field_validator, model_validator
 
+from ..extractor import extract_report_from_file
 from ..pipeline import AppError
 
 router = APIRouter(prefix="/api")
 REQUEST_TIMEOUT_S = 60
 LangType = Literal["en", "ur", "ro-ur"]
+
+
+class ExtractFileRequest(BaseModel):
+    filename: str = Field(..., min_length=1, max_length=255)
+    mime_type: str | None = Field(default=None, max_length=120)
+    data_base64: str = Field(..., min_length=1)
+    client_extracted_text: str | None = None
+    auto_analyze: bool = True
+    age: float | None = Field(default=None, ge=0, le=130)
+    sex: Literal["male", "female"] | None = None
+    lang: LangType = "en"
 
 
 class AnalyzeRequest(BaseModel):
@@ -70,14 +82,35 @@ async def health(request: Request):
     p = request.app.state.pipeline
     return {
         "status": "ok",
-        "version": "1.1.0",
+        "version": "1.2.0",
         "providers": [f"{prov}:{model}" for prov, model in p.llm.providers()],
         "llm_enabled": p.llm.enabled,
         "patients": len(p.patients),
         "supported_languages": ["en", "ur", "ro-ur"],
+        "supported_formats": ["pdf", "png", "jpg", "jpeg", "webp", "bmp", "docx", "csv", "json", "md", "txt"],
         "usage": p.llm.usage,
         "cache": p.llm.cache.stats(),
     }
+
+
+@router.post("/extract-file")
+async def extract_file(body: ExtractFileRequest, request: Request):
+    p = request.app.state.pipeline
+    extraction = await _run(
+        extract_report_from_file(
+            body.filename,
+            body.mime_type,
+            body.data_base64,
+            p.llm,
+            body.client_extracted_text,
+        )
+    )
+    analysis = None
+    if body.auto_analyze and extraction.get("extracted_text"):
+        analysis = await _run(
+            p.analyze(None, extraction["extracted_text"], body.age, body.sex, body.lang)
+        )
+    return {"extraction": extraction, "analysis": analysis}
 
 
 @router.get("/patients")

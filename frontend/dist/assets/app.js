@@ -78,6 +78,7 @@ const state = {
   chatLoading: false,
   health: null,
   speaking: false,
+  uploadedFileMeta: null,
 };
 
 function esc(s) {
@@ -178,7 +179,121 @@ function selectPatientAndOpen(pid, targetView = "analysis-results") {
   state.selectedPatientId = pid;
   state.overrideAge = null;
   state.overrideSex = null;
+  state.uploadedFileMeta = null;
   runAnalyze(true, targetView);
+}
+
+function fileToDataUrl(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = () => resolve(String(reader.result || ""));
+    reader.onerror = () => reject(new Error("Could not read file"));
+    reader.readAsDataURL(file);
+  });
+}
+
+async function extractPdfTextBrowser(file) {
+  try {
+    const pdfjs = window.pdfjsLib;
+    if (!pdfjs) return "";
+    pdfjs.GlobalWorkerOptions.workerSrc =
+      "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+    const buf = await file.arrayBuffer();
+    const doc = await pdfjs.getDocument({ data: buf }).promise;
+    const pages = [];
+    for (let i = 1; i <= doc.numPages; i++) {
+      const page = await doc.getPage(i);
+      const content = await page.getTextContent();
+      let lastY = null;
+      let line = "";
+      for (const item of content.items) {
+        const y = item.transform ? Math.round(item.transform[5]) : null;
+        if (lastY !== null && y !== null && Math.abs(y - lastY) > 4) {
+          pages.push(line.trim());
+          line = "";
+        }
+        line += (item.str || "") + " ";
+        if (y !== null) lastY = y;
+      }
+      if (line.trim()) pages.push(line.trim());
+    }
+    return pages.filter(Boolean).join("\n");
+  } catch (_) {
+    return "";
+  }
+}
+
+async function handleMultiFormatFileUpload(file) {
+  if (!file) return;
+  const fname = file.name || "uploaded_report";
+  const ext = fname.includes(".") ? fname.split(".").pop().toLowerCase() : "";
+
+  // Fast path for plain text / markdown
+  if (ext === "md" || ext === "txt") {
+    const txt = await file.text();
+    state.customText = txt;
+    state.activeMode = "custom";
+    state.overrideAge = null;
+    state.overrideSex = null;
+    state.uploadedFileMeta = { filename: fname, format: ext.toUpperCase(), method: "text_decoder", previewUrl: null };
+    await runAnalyze(true, "analysis-results");
+    return;
+  }
+
+  state.loading = true;
+  state.error = null;
+  state.activeMode = "custom";
+  state.overrideAge = null;
+  state.overrideSex = null;
+  state.chatHistory = [];
+  state.view = "analysis-results";
+  renderShell();
+  renderCurrentView();
+
+  try {
+    const dataUrl = await fileToDataUrl(file);
+    const isImg = file.type.startsWith("image/") || ["png", "jpg", "jpeg", "webp", "bmp", "gif"].includes(ext);
+    const isPdf = file.type === "application/pdf" || ext === "pdf";
+    const clientPdfText = isPdf ? await extractPdfTextBrowser(file) : null;
+
+    const res = await apiFetch(
+      "/api/extract-file",
+      {
+        method: "POST",
+        body: JSON.stringify({
+          filename: fname,
+          mime_type: file.type || null,
+          data_base64: dataUrl,
+          client_extracted_text: clientPdfText || null,
+          auto_analyze: true,
+          lang: state.lang,
+        }),
+      },
+      60000
+    );
+
+    if (res.extraction?.extracted_text) {
+      state.customText = res.extraction.extracted_text;
+    }
+    state.uploadedFileMeta = {
+      filename: res.extraction?.filename || fname,
+      format: res.extraction?.format || ext.toUpperCase() || "FILE",
+      method: res.extraction?.method || "multi_format_extractor",
+      previewUrl: isImg ? dataUrl : null,
+    };
+    if (res.analysis) {
+      state.analysis = res.analysis;
+    } else {
+      await runAnalyze(true, "analysis-results");
+      return;
+    }
+  } catch (err) {
+    state.error = err;
+  } finally {
+    state.loading = false;
+    renderShell();
+    renderCurrentView();
+  }
 }
 
 function openMobileSidebar() {
@@ -502,16 +617,21 @@ function renderDashboardView() {
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-3">
                 <div class="w-10 h-10 rounded-DEFAULT bg-primary-fixed/20 text-primary flex items-center justify-center">
-                  <span class="material-symbols-outlined text-[20px]">content_paste</span>
+                  <span class="material-symbols-outlined text-[20px]">upload_file</span>
                 </div>
                 <div>
-                  <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Paste Lab Report</h3>
-                  <p class="font-body-sm text-body-sm text-on-surface-variant">Direct raw unformatted text</p>
+                  <h3 class="font-headline-sm text-headline-sm font-bold text-on-surface">Upload or Paste Report</h3>
+                  <p class="font-body-sm text-body-sm text-on-surface-variant">PDF, Image (PNG/JPG), DOCX, CSV, or Text</p>
                 </div>
               </div>
               <button id="dash-load-sample" class="text-xs font-semibold text-primary hover:underline">Load Sample</button>
             </div>
-            <textarea id="dash-paste-input" class="w-full text-body-sm font-body-sm p-3 rounded-DEFAULT bg-surface-container-low border border-outline-variant/40 text-on-surface placeholder:text-outline focus:border-primary focus:bg-white outline-none resize-none" placeholder="e.g. Age: 38, Sex: Female, SGPT: 45 U/L, Fasting Blood Sugar: 6.0 mmol/L..." rows="4">${esc(state.customText)}</textarea>
+            <label class="w-full py-2.5 px-3 rounded-DEFAULT border-2 border-dashed border-primary/40 bg-primary-fixed/10 hover:bg-primary-fixed/20 text-primary font-label-md text-label-md font-semibold flex items-center justify-center gap-2 cursor-pointer transition-colors">
+              <span class="material-symbols-outlined text-[18px]">cloud_upload</span>
+              <span>Upload PDF, Image, DOCX, CSV, or MD</span>
+              <input type="file" id="dash-file-input" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.docx,.csv,.tsv,.json,.md,.txt,application/pdf,image/*" class="hidden" />
+            </label>
+            <textarea id="dash-paste-input" class="w-full text-body-sm font-body-sm p-3 rounded-DEFAULT bg-surface-container-low border border-outline-variant/40 text-on-surface placeholder:text-outline focus:border-primary focus:bg-white outline-none resize-none" placeholder="Or paste text: Age: 38, Sex: Female, SGPT: 45 U/L, Fasting Blood Sugar: 6.0 mmol/L..." rows="3">${esc(state.customText)}</textarea>
             <button id="dash-parse-btn" class="w-full py-2.5 px-4 bg-primary text-on-primary rounded-full font-label-md text-label-md font-semibold hover:bg-on-primary-fixed-variant transition-colors flex items-center justify-center gap-2">
               <span class="material-symbols-outlined text-[18px]">auto_fix_high</span>
               <span>Parse & Harmonize Report</span>
@@ -925,33 +1045,70 @@ function renderAnalyzeReportView() {
           </div>
         </section>
 
-        <!-- RIGHT COLUMN: Paste Laboratory Report Text Area (5 Cols) -->
+        <!-- RIGHT COLUMN: Multi-Format Upload & Paste Laboratory Report (5 Cols) -->
         <section class="col-span-12 xl:col-span-5 flex flex-col gap-6">
           <div class="bg-surface-container-lowest border border-outline-variant/40 rounded-lg p-6 shadow-xs flex flex-col h-full">
             <div class="flex items-center justify-between mb-2">
               <div>
-                <span class="font-label-sm text-label-sm text-secondary font-bold tracking-wider uppercase">Alternate Input • Direct OCR / Text</span>
-                <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">Paste Your Laboratory Report</h2>
+                <span class="font-label-sm text-label-sm text-secondary font-bold tracking-wider uppercase">Multi-Format Input • PDF / Image OCR / DOCX / CSV / Text</span>
+                <h2 class="font-headline-md text-headline-md text-on-surface font-semibold">Upload or Paste Laboratory Report</h2>
               </div>
               <button id="analyze-load-tricky" class="px-3 py-1 rounded-full bg-surface-container text-primary font-label-sm text-label-sm font-semibold hover:opacity-90">
                 Load Tricky Sample
               </button>
             </div>
             <p class="font-body-sm text-body-sm text-on-surface-variant mb-3">
-              Paste raw unformatted laboratory values, markdown tables, or noisy reports with CLIA/HIPAA boilerplate (max 200,000 characters).
+              Upload a digital or scanned <strong>PDF</strong>, lab photo/screenshot (<strong>PNG, JPG, WEBP</strong>), <strong>DOCX</strong>, <strong>CSV/JSON</strong>, or <strong>MD/TXT</strong> file — or paste raw laboratory text below.
             </p>
-            <textarea id="analyze-paste-textarea" class="w-full p-4 bg-surface-container-low/50 border border-outline-variant rounded-DEFAULT text-on-surface font-mono text-body-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all resize-y leading-relaxed" rows="12" placeholder="Paste laboratory text...">${esc(state.customText)}</textarea>
+
+            <!-- Multi-Format Drag & Drop Upload Box -->
+            <label id="multi-format-dropzone" class="mb-4 p-4 rounded-DEFAULT border-2 border-dashed border-primary/50 bg-primary-fixed/10 hover:bg-primary-fixed/20 transition-all cursor-pointer flex flex-col items-center justify-center text-center gap-2">
+              <div class="w-11 h-11 rounded-full bg-primary text-on-primary flex items-center justify-center shadow-xs">
+                <span class="material-symbols-outlined text-[24px]">cloud_upload</span>
+              </div>
+              <div>
+                <span class="font-label-lg text-label-lg font-bold text-primary block">Click or Drag & Drop Any Lab Report File</span>
+                <span class="font-body-sm text-body-sm text-on-surface-variant">Automatic OCR & structured extraction across all formats</span>
+              </div>
+              <div class="flex flex-wrap items-center justify-center gap-1.5 pt-1">
+                <span class="px-2.5 py-0.5 rounded-full bg-white border border-outline-variant/50 font-label-sm text-label-sm font-bold text-[#DC4545]">PDF</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-white border border-outline-variant/50 font-label-sm text-label-sm font-bold text-secondary">PNG / JPG / WEBP (Vision OCR)</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-white border border-outline-variant/50 font-label-sm text-label-sm font-bold text-[#3458C8]">DOCX</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-white border border-outline-variant/50 font-label-sm text-label-sm font-bold text-[#209B72]">CSV / JSON</span>
+                <span class="px-2.5 py-0.5 rounded-full bg-white border border-outline-variant/50 font-label-sm text-label-sm font-bold text-on-surface-variant">MD / TXT</span>
+              </div>
+              <input type="file" id="analyze-file-input" accept=".pdf,.png,.jpg,.jpeg,.webp,.bmp,.docx,.csv,.tsv,.json,.md,.txt,application/pdf,image/*" class="hidden" />
+            </label>
+
+            ${
+              state.uploadedFileMeta
+                ? `
+              <div class="mb-3 p-3 rounded-DEFAULT bg-surface-container-low border border-primary/30 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-3 min-w-0">
+                  ${
+                    state.uploadedFileMeta.previewUrl
+                      ? `<img src="${state.uploadedFileMeta.previewUrl}" alt="Uploaded Report Preview" class="w-12 h-12 object-cover rounded border border-outline-variant shrink-0" />`
+                      : `<div class="w-10 h-10 rounded bg-primary/15 text-primary flex items-center justify-center font-bold text-xs shrink-0">${esc(state.uploadedFileMeta.format)}</div>`
+                  }
+                  <div class="min-w-0">
+                    <div class="font-label-md text-label-md font-bold text-on-surface truncate">${esc(state.uploadedFileMeta.filename)}</div>
+                    <div class="font-label-sm text-label-sm text-primary">Extracted via ${esc(state.uploadedFileMeta.method)}</div>
+                  </div>
+                </div>
+                <span class="px-2.5 py-0.5 rounded-full bg-[#209B72]/15 text-[#209B72] font-label-sm text-label-sm font-bold shrink-0">Ready</span>
+              </div>
+            `
+                : ""
+            }
+
+            <textarea id="analyze-paste-textarea" class="w-full p-4 bg-surface-container-low/50 border border-outline-variant rounded-DEFAULT text-on-surface font-mono text-body-sm focus:border-secondary focus:ring-2 focus:ring-secondary/20 transition-all resize-y leading-relaxed" rows="8" placeholder="Paste laboratory text or upload a PDF / Image / DOCX / CSV above...">${esc(state.customText)}</textarea>
             <div class="flex items-center justify-between text-xs text-outline mt-2 mb-4">
               <span id="analyze-char-counter">${state.customText.length.toLocaleString()} / 200,000 characters</span>
-              <label class="cursor-pointer text-primary font-semibold flex items-center gap-1 hover:underline">
-                <span class="material-symbols-outlined text-[15px]">attach_file</span>
-                <span>Upload .md/.txt</span>
-                <input type="file" id="analyze-file-input" accept=".md,.txt" class="hidden" />
-              </label>
+              <span class="text-primary font-semibold">Supports PDF • PNG/JPG • DOCX • CSV • MD/TXT</span>
             </div>
             <button id="analyze-custom-submit" class="w-full bg-secondary hover:bg-secondary/90 text-on-secondary py-3 px-6 rounded-full font-label-lg text-label-lg font-bold flex items-center justify-center gap-2 shadow-sm transition-all">
               <span class="material-symbols-outlined text-[20px]">science</span>
-              <span>Analyze Pasted Report</span>
+              <span>Analyze Pasted / Extracted Report</span>
             </button>
           </div>
         </section>
@@ -1030,13 +1187,20 @@ function renderAnalysisResultsView() {
       <!-- Patient Demographics & Analysis Header Card -->
       <section class="bg-surface-container-lowest rounded-lg p-6 border border-outline-variant/30 card-shadow flex flex-wrap items-center justify-between gap-6">
         <div class="flex items-center gap-4">
-          <div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-primary font-headline-md text-headline-md font-bold">
-            ${esc(initials(p.name))}
-          </div>
+          ${
+            state.activeMode === "custom" && state.uploadedFileMeta?.previewUrl
+              ? `<img src="${state.uploadedFileMeta.previewUrl}" alt="Uploaded Report" class="w-14 h-14 rounded-lg object-cover border border-outline-variant shrink-0" />`
+              : `<div class="w-14 h-14 rounded-full bg-surface-container flex items-center justify-center text-primary font-headline-md text-headline-md font-bold">${esc(initials(p.name))}</div>`
+          }
           <div>
             <div class="flex items-center gap-2 flex-wrap">
               <h1 class="font-headline-lg text-headline-lg text-on-surface font-bold">${esc(p.name || "Custom Patient Report")}</h1>
               <span class="px-2.5 py-0.5 rounded-full bg-surface-container-high text-primary font-label-sm text-label-sm font-semibold">ID: ${esc(p.patient_id || "CUSTOM")}</span>
+              ${
+                state.activeMode === "custom" && state.uploadedFileMeta
+                  ? `<span class="px-2.5 py-0.5 rounded-full bg-secondary-fixed text-secondary font-label-sm text-label-sm font-bold">${esc(state.uploadedFileMeta.format)} • ${esc(state.uploadedFileMeta.filename)}</span>`
+                  : ""
+              }
               <!-- Quick Patient Switcher Dropdown -->
               <select id="results-quick-patient" class="ml-2 py-1 pl-3 pr-7 rounded-full bg-surface-container-low border border-outline-variant/50 font-label-sm text-label-sm text-on-surface cursor-pointer">
                 ${state.patients
@@ -1760,7 +1924,14 @@ function bindViewEvents() {
     });
   });
 
-  // Dashboard quick paste
+  // Dashboard quick paste & multi-format upload
+  const dashFileIn = document.getElementById("dash-file-input");
+  if (dashFileIn) {
+    dashFileIn.onchange = async (e) => {
+      const f = e.target.files?.[0];
+      if (f) await handleMultiFormatFileUpload(f);
+    };
+  }
   const dashLoad = document.getElementById("dash-load-sample");
   if (dashLoad) {
     dashLoad.onclick = () => {
@@ -1775,6 +1946,7 @@ function bindViewEvents() {
       state.activeMode = "custom";
       state.overrideAge = null;
       state.overrideSex = null;
+      state.uploadedFileMeta = null;
       runAnalyze(true, "analysis-results");
     };
   }
@@ -1869,9 +2041,23 @@ function bindViewEvents() {
     fileIn.onchange = async (e) => {
       const f = e.target.files?.[0];
       if (!f) return;
-      state.customText = await f.text();
-      state.activeMode = "custom";
-      runAnalyze(true, "analysis-results");
+      await handleMultiFormatFileUpload(f);
+    };
+  }
+  const dropzone = document.getElementById("multi-format-dropzone");
+  if (dropzone) {
+    dropzone.ondragover = (e) => {
+      e.preventDefault();
+      dropzone.classList.add("border-secondary", "bg-secondary-fixed/20");
+    };
+    dropzone.ondragleave = () => {
+      dropzone.classList.remove("border-secondary", "bg-secondary-fixed/20");
+    };
+    dropzone.ondrop = async (e) => {
+      e.preventDefault();
+      dropzone.classList.remove("border-secondary", "bg-secondary-fixed/20");
+      const f = e.dataTransfer?.files?.[0];
+      if (f) await handleMultiFormatFileUpload(f);
     };
   }
   const customSub = document.getElementById("analyze-custom-submit");

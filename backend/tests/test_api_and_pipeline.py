@@ -159,4 +159,20 @@ def test_api_endpoints_and_error_contracts():
             assert aud["passed_patients"] == 14 and aud["score_pct"] == 100.0
             assert all(cp["passed"] for cp in aud["checkpoints"])
 
+            # Bonus 5: Multi-format file extraction (/api/extract-file for CSV & PDF)
+            import base64
+            csv_b64 = base64.b64encode(
+                b"Patient Name,Hamza Tariq,\nAge,38,\nSex,Male,\nTest,Value,Unit\nSGPT,45,U/L\nFBS,6.0,mmol/L\n"
+            ).decode("ascii")
+            r_ext = await ac.post(
+                "/api/extract-file",
+                json={"filename": "sample.csv", "mime_type": "text/csv", "data_base64": csv_b64, "auto_analyze": True},
+            )
+            assert r_ext.status_code == 200
+            ext_json = r_ext.json()
+            assert ext_json["extraction"]["format"] == "CSV"
+            assert len(ext_json["analysis"]["results"]) == 2
+            assert ext_json["analysis"]["results"][0]["status"] == "normal"
+            assert ext_json["analysis"]["results"][1]["status"] == "high"
+
     asyncio.run(_run())

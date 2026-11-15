@@ -249,3 +249,94 @@ class LLMClient:
         self.usage["completion_tokens"] += tokens["completion"]
         log.info("llm ok provider=%s model=%s latency_ms=%d tokens=%s", provider, model, latency, tokens)
         return LLMResult(data=data, provider=provider, model=model, latency_ms=latency, tokens=tokens)
+
+    async def complete_multimodal_json(
+        self, system: str, prompt: str, mime_type: str, data_b64: str, temperature: float = 0.1, max_tokens: int = 2048
+    ) -> LLMResult:
+        """Multimodal Vision / PDF extraction across Gemini (PDF + images) and Groq/OpenRouter (images)."""
+        self._maybe_reload_env()
+        key = TTLCache.make_key("mm:" + system, prompt + ":" + mime_type + ":" + data_b64[:256] + str(len(data_b64)), temperature)
+        hit = self.cache.get(key)
+        if hit is not None:
+            return LLMResult(**{**hit, "cached": True, "latency_ms": 0})
+
+        candidates: list[tuple[str, str]] = []
+        if self.cfg.gemini_api_key:
+            candidates.append(("gemini", self.cfg.gemini_model))
+            if self.cfg.gemini_fallback_model and self.cfg.gemini_fallback_model != self.cfg.gemini_model:
+                candidates.append(("gemini", self.cfg.gemini_fallback_model))
+        if mime_type.startswith("image/"):
+            if self.cfg.groq_api_key:
+                candidates.append(("groq", "meta-llama/llama-4-scout-17b-16e-instruct"))
+            if self.cfg.openrouter_api_key:
+                candidates.append(("openrouter", "google/gemini-2.0-flash-exp:free"))
+
+        if not candidates:
+            raise LLMError("No multimodal LLM provider configured for Vision/PDF OCR.")
+
+        last_err: LLMError | None = None
+        for idx, (provider, model) in enumerate(candidates):
+            t0 = time.perf_counter()
+            try:
+                async with self._sem:
+                    await self._throttle()
+                    if provider == "gemini":
+                        url = f"https://generativelanguage.googleapis.com/v1beta/models/{model}:generateContent"
+                        body = {
+                            "systemInstruction": {"parts": [{"text": system}]},
+                            "contents": [
+                                {
+                                    "role": "user",
+                                    "parts": [
+                                        {"inline_data": {"mime_type": mime_type, "data": data_b64}},
+                                        {"text": prompt},
+                                    ],
+                                }
+                            ],
+                            "generationConfig": {
+                                "temperature": temperature,
+                                "maxOutputTokens": max_tokens,
+                                "responseMimeType": "application/json",
+                            },
+                        }
+                        r = await self._client.post(url, json=body, headers={"x-goog-api-key": self.cfg.gemini_api_key})
+                    else:
+                        url = (
+                            "https://api.groq.com/openai/v1/chat/completions"
+                            if provider == "groq"
+                            else "https://openrouter.ai/api/v1/chat/completions"
+                        )
+                        api_key = self.cfg.groq_api_key if provider == "groq" else self.cfg.openrouter_api_key
+                        body = {
+                            "model": model,
+                            "messages": [
+                                {
+                                    "role": "user",
+                                    "content": [
+                                        {"type": "text", "text": f"{system}\n\n{prompt}"},
+                                        {"type": "image_url", "image_url": {"url": f"data:{mime_type};base64,{data_b64}"}},
+                                    ],
+                                }
+                            ],
+                            "temperature": temperature,
+                            "max_tokens": max_tokens,
+                            "response_format": {"type": "json_object"},
+                        }
+                        r = await self._client.post(url, json=body, headers={"Authorization": f"Bearer {api_key}"})
+
+                latency = int((time.perf_counter() - t0) * 1000)
+                if r.status_code != 200:
+                    raise LLMError(f"{provider} multimodal HTTP {r.status_code}: {r.text[:200]}", status=r.status_code)
+                payload = r.json()
+                if provider == "gemini":
+                    text = "".join(p.get("text", "") for p in payload["candidates"][0]["content"]["parts"])
+                else:
+                    text = payload["choices"][0]["message"]["content"] or ""
+                data = extract_json(text)
+                res = LLMResult(data=data, provider=provider, model=model, latency_ms=latency, fallback_used=idx > 0)
+                self.cache.set(key, {k: v for k, v in res.__dict__.items() if k != "cached"})
+                return res
+            except Exception as e:
+                last_err = e if isinstance(e, LLMError) else LLMError(str(e))
+                log.warning("multimodal provider failed provider=%s model=%s err=%s", provider, model, e)
+        raise last_err or LLMError("Multimodal extraction failed across all providers")
